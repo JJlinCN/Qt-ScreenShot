@@ -30,6 +30,11 @@ ApplicationWindow{
                 root.hide()
                 capture.startRectShot()
             }
+            if(cbb.displayText==='活动窗口截取'){
+                count++
+                root.hide()
+                capture.startActiveShot()
+            }
         }
         Connections {
             target:capture
