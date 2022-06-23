@@ -2,9 +2,11 @@
 #include <QApplication>
 #include <QScreen>
 #include "RecScreen.h"
+#include "imgprovider.h"
 
-Capture::Capture(QMainWindow *parent):QMainWindow(parent),m_captureCount{0},m_path{"/temp/"}{
+Capture::Capture(QMainWindow *parent):QMainWindow(parent)/*,m_captureCount{0}*//*,m_path{"/temp/"}*/{
 
+    imageProvider = new ImageProvider;
 }
 std::string Capture::exec(const char *cmd)
 {
@@ -36,13 +38,13 @@ void Capture::startActiveShot()
 
     this->setCursor(Qt::ArrowCursor);  //显示正常鼠标
     pixmap=screen->grabWindow(id);
-    //imgProvider->img=pixmap.toImage();
+    imageProvider->image=pixmap.toImage();
 
-    QImage img=pixmap.toImage();
+   // QImage img=pixmap.toImage();
 
-    m_captureCount ++ ;
-    QString path = m_path + QString("%1.jpg").arg(m_captureCount);
-    img.save(path);
+   // m_captureCount ++ ;
+   // QString path = m_path + QString("%1.jpg").arg(m_captureCount);
+   // img.save(path);
 
     //发送信号 将形截取的图片在姐妹显示
     emit callImageChanged();
@@ -52,11 +54,11 @@ void Capture::startActiveShot()
 
 void Capture::cutScreen(QPixmap capturePixmap){
 
-    QImage image = capturePixmap.toImage();
-    //imgProvider->img=pixmap.toImage();
-    m_captureCount ++ ;
-    QString path = m_path + QString("%1.jpg").arg(m_captureCount);
-    image.save(path);
+    //QImage image = capturePixmap.toImage();
+    imageProvider->image=capturePixmap.toImage();
+    //m_captureCount ++ ;
+    //QString path = m_path + QString("%1.jpg").arg(m_captureCount);
+   // image.save(path);
     emit finishCapture();
     emit callImageChanged();
 }
