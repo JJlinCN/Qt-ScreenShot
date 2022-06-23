@@ -29,6 +29,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Button.h \
     capture.h \
+    imgprovider.h \
     longshot.h \
     shot.h \
     RecScreen.h \
