@@ -4,6 +4,8 @@ QT += widgets printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 SOURCES += \
+    capture.cpp \
+    longshot.cpp \
         shot.cpp \
         main.cpp \
         recscreen.cpp \
@@ -26,7 +28,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     Button.h \
+    capture.h \
+    longshot.h \
     shot.h \
     RecScreen.h \
 FORMS += \
     shot.ui \
+
+DISTFILES += \
+    MainContent.qml
+
+FORMS += \
+    form.ui

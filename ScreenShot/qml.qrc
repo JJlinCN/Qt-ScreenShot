@@ -43,5 +43,6 @@
         <file>icons/wexin.png</file>
         <file>icons/width.png</file>
         <file>main.qml</file>
+        <file>MainContent.qml</file>
     </qresource>
 </RCC>

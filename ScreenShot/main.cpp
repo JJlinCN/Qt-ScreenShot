@@ -1,19 +1,19 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
-#include "RecScreen.h"
+#include "capture.h"
 #include "shot.h"
 #include  <QQmlContext>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    CaptureScreen *capture = new CaptureScreen();
+    Capture *capture = new Capture;
     Shot *fullscreen = new Shot();
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("recshot",capture);
+    engine.rootContext()->setContextProperty("capture",capture);
     engine.rootContext()->setContextProperty("fullshot",fullscreen);
     engine.rootContext()->setContextProperty("button",fullscreen->OK);
-    const QUrl url(u"qrc:/ScreenShot/main.qml"_qs);
+    const QUrl url("qrc:/main.qml");
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
         if (!obj && url == objUrl)
