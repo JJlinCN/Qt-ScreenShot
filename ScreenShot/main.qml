@@ -31,6 +31,13 @@ ApplicationWindow {
                     //rootApp.visible=false;
                 }
             }
+            ToolButton{
+                id:button3
+                text:qsTr("长截图")
+                onClicked:{
+                    LongShot.show()
+                }
+            }
         }
     }
     Image {
