@@ -16,40 +16,67 @@ ApplicationWindow {
     MainContent {
         id: maincontent
         anchors.fill: parent
-        shotBtn.onClicked: {
-            if (cbb.displayText === '全屏截取') {
-                capture.startFullShot()
-            }
-            if (cbb.displayText === '长截图') {
-                button.clicked()
-            }
-            if (cbb.displayText === '矩形截取') {
-                //  count++
-                root.hide()
-                capture.startRectShot()
-            }
-            if (cbb.displayText === '活动窗口截取') {
-                //count++
-                root.hide()
-                capture.startActiveShot()
-            }
-        }
-        //        Connections {
-        //            target: capture
-        //            function onCallImageChanged() {
-        //                count = !count
-        //                maincontent.img.source = "image://screen?id=" + count
-        //            }
-        //        }
         Connections {
             target: capture
-            function onImageCopied() {//                console.log("copied")
+            function onImageCopied() {//
+                console.log(maincontent.content.height)
+                maincontent.content.height-=45
+                console.log(maincontent.content.height)
+                loader.sourceComponent=messagebox
             }
         }
     }
-
+    Loader {
+        id: loader
+        anchors.bottom: footer.top
+        width: parent.width
+        height: 45
+    }
+    Component{
+        id:messagebox
+        Rectangle {
+            id: rectangle
+            color: "#7447b9f0"
+            radius: 5
+            border.color: "#2cace5"
+            border.width: 2
+            Image {
+                id: image
+                x:20 //不知为什么设置anchors.leftMargin无效，改用x偏移20px
+                width: 32
+                height: 25
+                source: "icons/logo.png"
+                fillMode: Image.PreserveAspectFit
+                anchors.rightMargin: 10
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            Text {
+                id: text1
+                width: 264
+                height: 25
+                text: qsTr("The image has been copide clipbord!")
+                font.pixelSize: 16
+                anchors.left: image.right
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            Button{
+                id: closebtn
+                width: 30
+                height: 30
+                icon.name:"window-close"
+                anchors.right: parent.right
+                anchors.rightMargin: 10
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked:function(){
+                    loader.sourceComponent=undefined
+                    maincontent.content.height+=45
+                    console.log(maincontent.content.height)
+                }
+            }
+        }
+    }
     footer: ToolBar {
-
+        id:footer
         height: row.height + 20
 
         RowLayout {

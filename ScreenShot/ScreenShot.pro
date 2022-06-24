@@ -11,9 +11,11 @@ INCLUDEPATH += /usr/include/KF5/KWindowSystem
 SOURCES += \
     capture.cpp \
     filter.cpp \
+    freecapture.cpp \
     longshot.cpp \
         main.cpp \
     mosaic.cpp \
+    mylabel.cpp \
         recscreen.cpp \
 
 resources.files = main.qml 
@@ -35,11 +37,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     capture.h \
     filter.h \
+    freecapture.h \
     imgprovider.h \
     longshot.h \
     RecScreen.h \
 FORMS += \
-    mosaic.h
+    mosaic.h \
+    mylabel.h
 
 DISTFILES += \
     MainContent.qml

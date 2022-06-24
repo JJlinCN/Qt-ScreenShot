@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QScreen>
 #include "RecScreen.h"
+#include "freecapture.h"
 #include "imgprovider.h"
 #include "mylabel.h"
 #include <KWindowSystem>
@@ -119,4 +120,10 @@ void Capture::startRectShot(){
     connect(m_rectScreenShot,&RectScreen::signalCompleteCapture,this,&Capture::cutScreen);
     connect(m_rectScreenShot,&RectScreen::nullCapture,this,&Capture::cutNull);
     m_rectScreenShot->show();
+}
+
+void Capture::startFreeShot(){
+    m_freeScreenShot = new FreeCapture;
+    connect(m_freeScreenShot,&FreeCapture::signalCompleteCapture,this,&Capture::cutScreen);
+    m_freeScreenShot->show();
 }
