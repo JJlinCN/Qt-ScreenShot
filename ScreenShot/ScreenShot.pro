@@ -5,8 +5,10 @@ QT += widgets printsupport
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 SOURCES += \
     capture.cpp \
+    filter.cpp \
     longshot.cpp \
         main.cpp \
+    mosaic.cpp \
         recscreen.cpp \
 
 resources.files = main.qml 
@@ -27,13 +29,17 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     capture.h \
+    filter.h \
     imgprovider.h \
     longshot.h \
     RecScreen.h \
 FORMS += \
+    mosaic.h
 
 DISTFILES += \
     MainContent.qml
 
 FORMS += \
-    form.ui
+    filter.ui \
+    form.ui \
+    mosaic.ui
