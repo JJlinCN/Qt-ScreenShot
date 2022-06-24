@@ -6,6 +6,7 @@
 
 class ImageProvider;
 class RectScreen;
+class MyLabel;
 
 class Capture : public QMainWindow
 {
@@ -23,15 +24,21 @@ signals:
     void imageCopied();
 
 public slots:
-    void cutScreen(QPixmap capturePixmap);
-    void cutNull();
+    void cutScreen(QPixmap capturePixmap); //将矩形截图和长截图的图片传递到qml中，并且复制
+    void cutNull(); //没有截取屏幕，即退出了截屏
+
     void startRectShot();
     void startActiveShot();
     void startFullShot();
-    void copyToClipboard(QImage image);
+    void copyToClipboard(QImage image); //将内容复制到剪切板
+
+    void nailedToTable(); //把图片钉在桌面上，是在矩形截图的默认功能下
+    void cutNailScreen(QPixmap pixmap);//将钉在桌面上的图片显示出来。
+
 private:
 
 RectScreen *m_rectScreenShot;
+MyLabel *m_nailImage;
 //int m_captureCount;
 //QString m_path;
 };

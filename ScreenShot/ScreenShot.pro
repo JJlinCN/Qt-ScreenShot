@@ -3,6 +3,11 @@ QT += gui
 QT += widgets printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+LIBS += /usr/lib/libKF5WindowSystem.so.5
+
+INCLUDEPATH += /usr/include/KF5/KWindowSystem
+
 SOURCES += \
     capture.cpp \
     filter.cpp \

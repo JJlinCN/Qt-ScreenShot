@@ -3,6 +3,9 @@
 #include <QScreen>
 #include "RecScreen.h"
 #include "imgprovider.h"
+#include "mylabel.h"
+#include <KWindowSystem>
+#include <QDebug>
 
 Capture::Capture(QMainWindow *parent):QMainWindow(parent)/*,m_captureCount{0}*//*,m_path{"/temp/"}*/{
 
@@ -32,7 +35,8 @@ void Capture::startActiveShot()
     WId id=std::strtol(c,&stop,16);
 
     qDebug()<<"窗口ID："<<id;
-
+//    WId id = KWindowSystem::activeWindow();
+//    qDebug()<<id;
     QPixmap pixmap;
     QScreen *screen=QApplication::primaryScreen();
 
@@ -71,6 +75,27 @@ void Capture::copyToClipboard(QImage image){
     QApplication::clipboard()->clear();
     QApplication::clipboard()->setImage(image,QClipboard::Clipboard);
     emit imageCopied();
+}
+
+void Capture::nailedToTable()
+{
+   m_rectScreenShot = new RectScreen();
+   connect(m_rectScreenShot,&RectScreen::signalCompleteCapture,this,&Capture::cutNailScreen);
+   m_rectScreenShot->show();
+}
+
+void Capture::cutNailScreen(QPixmap pixmap)
+{
+    //QImage image = pixmap.toImage()
+    imageProvider->image = pixmap.toImage();
+    //image.save();
+    m_nailImage = new MyLabel();
+    m_nailImage->setPixmap(pixmap);
+
+    m_nailImage->show();
+
+    emit callImageChanged();
+    emit finishCapture();
 }
 
 void Capture::cutScreen(QPixmap capturePixmap){

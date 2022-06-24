@@ -25,18 +25,6 @@ RectScreen::~RectScreen(){
 
 }
 
-//void RectScreen::cutScreen(QPixmap imagePixmap)
-//{
-//    QImage image = imagePixmap.toImage();
-//    m_imageCount ++ ;
-//    QString path = QString("/temp/%1.jpg").arg(m_imageCount);
-//    image.save(path);
-//   // if(image.save(path)){
-//      //  emit finishSaveImage();
-//   // }
-
-//}
-
 void RectScreen::initWindow(){
     this->setMouseTracking(true);
     this->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
