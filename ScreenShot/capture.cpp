@@ -52,10 +52,32 @@ void Capture::startActiveShot()
     emit finishCapture();
 }
 
+void Capture::startFullShot()
+{
+    QPixmap pixmap;
+    QScreen *screen=QApplication::primaryScreen();//获得当前主屏幕
+    pixmap=screen->grabWindow(0);  //参数为0,抓取整个屏幕
+    QImage img=pixmap.toImage();
+    imageProvider->image = img;  //将抓取到的图片提供给qml
+    copyToClipboard(img);
+    emit callImageChanged();
+    emit finishCapture();
+    //img.save("/root/MyProject/1.jpg");
+
+}
+
+void Capture::copyToClipboard(QImage image){
+   // QImage image = capturePixmap.toImage();
+    QApplication::clipboard()->clear();
+    QApplication::clipboard()->setImage(image,QClipboard::Clipboard);
+    emit imageCopied();
+}
+
 void Capture::cutScreen(QPixmap capturePixmap){
 
-    //QImage image = capturePixmap.toImage();
-    imageProvider->image=capturePixmap.toImage();
+    QImage image = capturePixmap.toImage();
+    imageProvider->image=image;
+    copyToClipboard(image);
     //m_captureCount ++ ;
     //QString path = m_path + QString("%1.jpg").arg(m_captureCount);
    // image.save(path);

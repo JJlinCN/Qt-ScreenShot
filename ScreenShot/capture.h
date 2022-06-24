@@ -19,13 +19,16 @@ public:
 signals:
     //以下两个信号都是c++端和qml端通信的信号
     void finishCapture();  //告诉qml截屏结束了
-    void callImageChanged();  //有新的截屏产生，告知qml有新的图片截取下来了
+    void callImageChanged();  //有新的截屏产生，告知qml有新的图片截取下来
+    void imageCopied();
 
 public slots:
     void cutScreen(QPixmap capturePixmap);
     void cutNull();
     void startRectShot();
     void startActiveShot();
+    void startFullShot();
+    void copyToClipboard(QImage image);
 private:
 
 RectScreen *m_rectScreenShot;

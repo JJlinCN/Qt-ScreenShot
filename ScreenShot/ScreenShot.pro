@@ -6,7 +6,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 SOURCES += \
     capture.cpp \
     longshot.cpp \
-        shot.cpp \
         main.cpp \
         recscreen.cpp \
 
@@ -27,14 +26,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    Button.h \
     capture.h \
     imgprovider.h \
     longshot.h \
-    shot.h \
     RecScreen.h \
 FORMS += \
-    shot.ui \
 
 DISTFILES += \
     MainContent.qml

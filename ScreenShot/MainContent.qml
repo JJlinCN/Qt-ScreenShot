@@ -4,10 +4,11 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 Item {
-    property alias img:img
+    property alias img: img
     property alias shotBtn: shotBtn
-    property alias cbb:cbb
-    id:contentleft
+    property alias cbb: cbb
+    property bool count: false
+    id: contentleft
 
     Image {
         id: img
@@ -23,14 +24,20 @@ Item {
         source: "./icons/logo.png"
         fillMode: Image.PreserveAspectFit
     }
-
-    Item{
-        id:recright
+    Connections {
+        target: capture
+        function onCallImageChanged() {
+            count = !count
+            maincontent.img.source = "image://screen?id=" + count
+        }
+    }
+    Item {
+        id: recright
         width: 250
         height: parent.height
         anchors.right: parent.right
-        ColumnLayout{
-            id:column1
+        ColumnLayout {
+            id: column1
             x: 0
             y: 0
             width: 250
@@ -63,20 +70,20 @@ Item {
                         ListElement {
                             text: qsTr("矩形截取")
                         }
-                        ListElement{
+                        ListElement {
                             text: qsTr("不规则截取")
                         }
                         ListElement {
                             text: qsTr("活动窗口截取")
                         }
-                        ListElement{
-                            text:qsTr("连续截取")
+                        ListElement {
+                            text: qsTr("连续截取")
                         }
-                        ListElement{
-                            text:qsTr("钉在桌面")
+                        ListElement {
+                            text: qsTr("钉在桌面")
                         }
-                        ListElement{
-                            text:qsTr("长截图")
+                        ListElement {
+                            text: qsTr("长截图")
                         }
                     }
                 }
@@ -95,9 +102,9 @@ Item {
                     editable: true
                     Layout.preferredWidth: 82
                     //                    minimumValue: 0
-                      value:0
-//                    suffix: "秒"
-//                    decimals: 0
+                    value: 0
+                    //                    suffix: "秒"
+                    //                    decimals: 0
                     stepSize: 1
                 }
                 CheckBox {
@@ -125,7 +132,7 @@ Item {
                 layoutDirection: Qt.LeftToRight
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 CheckBox {
-                    id:check_2
+                    id: check_2
                     text: qsTr("隐藏当前窗口")
                 }
                 CheckBox {
@@ -134,7 +141,7 @@ Item {
             }
         }
         Button {
-            id:shotBtn
+            id: shotBtn
             x: 75
             y: 369
             width: 100
@@ -143,19 +150,25 @@ Item {
             checked: false
             rotation: 0
             anchors.bottomMargin: 61
-            text:qsTr("截取屏幕")
+            text: qsTr("截取屏幕")
             icon.source: "./icons/logo.png"
-            Shortcut{
+            Shortcut {
                 sequence: "Ctrl+Alt+P"
                 onActivated: shotBtn.clicked()
             }
         }
     }
+    Connections {
+        target: capture
+        function onFinishCapture() {
+            root.showNormal()
+        }
+    }
 }
-
 
 /*##^##
 Designer {
     D{i:0;autoSize:true;height:480;width:640}
 }
 ##^##*/
+

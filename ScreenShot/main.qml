@@ -12,33 +12,38 @@ ApplicationWindow {
     minimumHeight: 480
     minimumWidth: 680
     visible: true
-    property int count: 0
+    //property int count: 0
     MainContent {
         id: maincontent
         anchors.fill: parent
         shotBtn.onClicked: {
             if (cbb.displayText === '全屏截取') {
-                fullshot.show()
+                capture.startFullShot()
             }
             if (cbb.displayText === '长截图') {
                 button.clicked()
             }
             if (cbb.displayText === '矩形截取') {
-                count++
+                //  count++
                 root.hide()
                 capture.startRectShot()
             }
             if (cbb.displayText === '活动窗口截取') {
-                count++
+                //count++
                 root.hide()
                 capture.startActiveShot()
             }
         }
+        //        Connections {
+        //            target: capture
+        //            function onCallImageChanged() {
+        //                count = !count
+        //                maincontent.img.source = "image://screen?id=" + count
+        //            }
+        //        }
         Connections {
             target: capture
-            function onFinishCapture() {
-                maincontent.img.source = "image://screen/"
-                root.showNormal()
+            function onImageCopied() {//                console.log("copied")
             }
         }
     }
