@@ -82,7 +82,7 @@ void RectScreen::mouseMoveEvent(QMouseEvent *event){
 
     if(m_currentCaptureState == BeginCaptureImage){
         m_endPoint = event->pos();
-        update();   //move事件需要不断更新是以为鼠标在不断地移动，屏幕每次需要对鼠标的位置进行刷新更新
+        update();   //move事件需要不断更新是因为鼠标在不断地移动，屏幕每次需要对鼠标的位置进行刷新更新
     }else if(m_currentCaptureState == BeginMoveCaptureArea){
         m_endMovePoint = event->pos();
         update();

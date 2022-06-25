@@ -76,7 +76,7 @@ private:
 private:
     CaptureState m_currentCaptureState;
 
-   bool m_isMousePressed;  //用来判断事件发生时按键是否是按下的，鼠标的按键是否按下，有不同的处理方法
+    bool m_isMousePressed;  //用来判断事件发生时按键是否是按下的，鼠标的按键是否按下，有不同的处理方法
 
     QPixmap m_loadPixmap;  //要加载的像素集
     QPixmap m_capturePixmap; //捕捉到的像素集
