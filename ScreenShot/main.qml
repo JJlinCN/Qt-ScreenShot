@@ -19,60 +19,24 @@ ApplicationWindow {
         Connections {
             target: capture
             function onImageCopied() {//
-                console.log(maincontent.content.height)
-                maincontent.content.height-=45
-                console.log(maincontent.content.height)
-                loader.sourceComponent=messagebox
+                loadMessage.source="MessageBox.qml"
+                //Loader 的 item 属性指向它加载的组件的顶层 item 对于 Loader 加载的 item ，它暴露出来的接口，如属性、信号等，都可以通过 Loader 的 item 属性来访问。
             }
         }
     }
+    Annotation{
+        id:annotation
+        anchors.fill: parent
+        visible: false
+    }
+
     Loader {
-        id: loader
+        id: loadMessage
         anchors.bottom: footer.top
         width: parent.width
         height: 45
-    }
-    Component{
-        id:messagebox
-        Rectangle {
-            id: rectangle
-            color: "#7447b9f0"
-            radius: 5
-            border.color: "#2cace5"
-            border.width: 2
-            Image {
-                id: image
-                x:20 //不知为什么设置anchors.leftMargin无效，改用x偏移20px
-                width: 32
-                height: 25
-                source: "icons/logo.png"
-                fillMode: Image.PreserveAspectFit
-                anchors.rightMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Text {
-                id: text1
-                width: 264
-                height: 25
-                text: qsTr("The image has been copide clipbord!")
-                font.pixelSize: 16
-                anchors.left: image.right
-                anchors.verticalCenter: parent.verticalCenter
-            }
-            Button{
-                id: closebtn
-                width: 30
-                height: 30
-                icon.name:"window-close"
-                anchors.right: parent.right
-                anchors.rightMargin: 10
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked:function(){
-                    loader.sourceComponent=undefined
-                    maincontent.content.height+=45
-                    console.log(maincontent.content.height)
-                }
-            }
+        onLoaded: ()=>{
+            loadMessage.item.title="a image has been copied!"
         }
     }
     footer: ToolBar {
@@ -153,6 +117,27 @@ ApplicationWindow {
                         sequence: "Ctrl+E"
                         onActivated: btn.clicked()
                     }
+                    onClicked: ()=>{
+                                   if(btn.text==="注释(E)"){
+                                       btn_1.enabled=false
+                                       btn_2.enabled=false
+                                       btn_4.enabled=false
+                                       btn_3.enabled=true
+                                       btn.text="注释完成"
+                                       maincontent.visible=false
+                                       annotation.visible=true //不用Loader的原因是该组件中的图片依赖根环境中的c++数据对象，使用Loader会新建一个环境，就不在根环境中了
+                                   }else{
+                                       //将修改过后的涂鸦内容保存 *
+                                       maincontent.refreshImage();//发射信号通知主界面刷新涂鸦后的图片 利用provider从缓存中读取
+                                       btn.text="注释(E)"
+                                       btn_1.enabled=true
+                                       btn_2.enabled=true
+                                       btn_3.enabled=true
+                                       btn_4.enabled=true
+                                       maincontent.visible=true
+                                       annotation.visible=false
+                                   }
+                               }
                 }
                 Button {
                     id: btn_1

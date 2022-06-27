@@ -44,5 +44,7 @@
         <file>icons/width.png</file>
         <file>main.qml</file>
         <file>MainContent.qml</file>
+        <file>MessageBox.qml</file>
+        <file>Annotation.qml</file>
     </qresource>
 </RCC>

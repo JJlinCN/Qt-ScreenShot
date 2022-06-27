@@ -26,6 +26,9 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void cutFinalImage();
+    bool isPressPointInSelectPolygon(QPoint mousePressPoint);
+    void movePolygonCaculator();
+    void drawCurrentSelectPolygon();
 private:
     void initWindow();
     void loadBackgroundPixmap();
@@ -33,15 +36,17 @@ private:
 private:
     CaptureStateFree m_currentCaptureState;
     QPixmap m_loadPixmap;//加载背景图片
-    QPixmap m_capturePixmap; //捕捉到的像素集
     int m_screenwidth;
     int m_screenheight;
     bool m_isMousePress;  //是否鼠标左击
     bool m_isMouseRelease;//是否鼠标二次点击
     QPolygon  m_pPoints;   //点集合
+    QPolygon  m_pInitPoints; //最初的点集合
+    QPoint m_beginMovePoint;
+    QPoint m_endMovePoint;
     QPainter  m_painter;
     QPainter  m_imagePaint;
-    QRect m_currentSelectRect;
+    QRect m_currentSelectPolygon;
 signals:
     // 通知截图完毕，并将截取图片传递给调用类;
     void signalCompleteCapture(QPixmap captureImage);

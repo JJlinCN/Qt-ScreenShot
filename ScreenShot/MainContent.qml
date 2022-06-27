@@ -4,9 +4,12 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 Item {
-    property bool count: false
-    property alias content: content
-    id: content
+    signal refreshImage()
+    onRefreshImage: ()=>{
+         img.source = ""
+         img.source = "image://screen"
+         /*img.source = "image://screen?id=" + count*/ //布尔值只是为了循环刷新路径触发provider中的requestimage函数返回缓存中的image图片到qml端显示
+    }
     Image {
         id: img
         width: parent.width - recright.width
@@ -139,7 +142,6 @@ Item {
             height: 50
             anchors.bottom: parent.bottom
             checked: false
-            rotation: 0
             anchors.bottomMargin: 61
             text: qsTr("截取屏幕")
             icon.source: "./icons/logo.png"
@@ -208,8 +210,8 @@ Item {
     Connections {
         target: capture
         function onCallImageChanged() {
-            count = !count
-            img.source = "image://screen?id=" + count
+            img.source = ""
+            img.source = "image://screen"
         }
     }
     Connections {
