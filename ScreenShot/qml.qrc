@@ -46,5 +46,6 @@
         <file>MainContent.qml</file>
         <file>MessageBox.qml</file>
         <file>Annotation.qml</file>
+        <file>Dialogs.qml</file>
     </qresource>
 </RCC>

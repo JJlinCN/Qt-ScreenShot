@@ -5,12 +5,14 @@
 #include "freecapture.h"
 #include "imgprovider.h"
 #include "mylabel.h"
+#include "filter.h"
 #include <KWindowSystem>
 #include <QDebug>
 
 Capture::Capture(QMainWindow *parent):QMainWindow(parent)/*,m_captureCount{0}*//*,m_path{"/temp/"}*/{
 
     imageProvider = new ImageProvider;
+    m_filter = new Filter;//所有滤镜操作应共享一个滤镜器及其资源,每次截取会把截取到的图片设置为滤镜器的初始图片，滤镜则是复制一份初始图片进行修改，方便回退初始图片undo
 }
 std::string Capture::exec(const char *cmd)
 {
@@ -44,6 +46,7 @@ void Capture::startActiveShot()
     this->setCursor(Qt::ArrowCursor);  //显示正常鼠标
     pixmap=screen->grabWindow(id);
     imageProvider->image=pixmap.toImage();
+    m_filter->setFilterImage(imageProvider->image);
 
    // QImage img=pixmap.toImage();
 
@@ -68,7 +71,7 @@ void Capture::startFullShot()
     emit callImageChanged();
     emit finishCapture();
     //img.save("/root/MyProject/1.jpg");
-
+    m_filter->setFilterImage(imageProvider->image);//设置滤镜初始图片为缓存图片
 }
 
 void Capture::copyToClipboard(QImage image){
@@ -76,6 +79,10 @@ void Capture::copyToClipboard(QImage image){
     QApplication::clipboard()->clear();
     QApplication::clipboard()->setImage(image,QClipboard::Clipboard);
     emit imageCopied();
+}
+
+void Capture::copyCurrentImageToClipboard(){
+    copyToClipboard(imageProvider->image);
 }
 
 void Capture::nailedToTable()
@@ -89,6 +96,7 @@ void Capture::cutNailScreen(QPixmap pixmap)
 {
     //QImage image = pixmap.toImage()
     imageProvider->image = pixmap.toImage();
+    m_filter->setFilterImage(imageProvider->image);//将截取到的图片作为滤镜器的起始图片
     //image.save();
     m_nailImage = new MyLabel();
     m_nailImage->setPixmap(pixmap);
@@ -103,6 +111,7 @@ void Capture::cutScreen(QPixmap capturePixmap){
 
     QImage image = capturePixmap.toImage();
     imageProvider->image=image;
+    m_filter->setFilterImage(imageProvider->image);
     copyToClipboard(image);
     //m_captureCount ++ ;
     //QString path = m_path + QString("%1.jpg").arg(m_captureCount);
@@ -126,4 +135,59 @@ void Capture::startFreeShot(){
     m_freeScreenShot = new FreeCapture;
     connect(m_freeScreenShot,&FreeCapture::signalCompleteCapture,this,&Capture::cutScreen);
     m_freeScreenShot->show();
+}
+
+void Capture::filterRefresh(QImage img){
+    imageProvider->image=img;
+    emit callImageChanged();//刷新图片
+}
+
+void Capture::filterGrey(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->grey();
+}
+
+void Capture::filterOld(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->old();
+}
+
+void Capture::filterWarm(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->warm();
+}
+
+void Capture::filterCool(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->cool();
+}
+
+void Capture::filterVague(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->vague();
+}
+
+void Capture::filterReverse(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->reverse();
+}
+
+void Capture::filterSharpen(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->sharpen();
+}
+
+void Capture::filterSoften(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->soften();
+}
+
+void Capture::filterUndo(){
+    connect(m_filter,&Filter::sendFilterImage,this,&Capture::filterRefresh);
+    m_filter->undo();
+}
+
+void Capture::saveImage(QString savePath){
+    imageProvider->image.save(savePath);
+    qDebug()<<savePath;
 }

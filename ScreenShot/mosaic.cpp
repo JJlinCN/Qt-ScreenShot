@@ -6,22 +6,9 @@
 #include <QDebug>
 
 Mosaic::Mosaic(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui_Form2)
+    QWidget(parent)
 {
-    ui->setupUi(this);
-
     setWindowTitle(tr("马赛克"));
-
-    ui->scrollArea->setWidget(ui->label);
-    m_Image.load("/root/MyProject/2.jpg");
-    m_pixmap = QPixmap::fromImage(m_Image).scaled(size()/*,Qt::KeepAspectRatio,Qt::SmoothTransformation*/);
-    ui->label->setPixmap(m_pixmap);
-}
-
-Mosaic::~Mosaic()
-{
-    delete ui;
 }
 
 void Mosaic::paintEvent(QMouseEvent *e)
@@ -53,7 +40,7 @@ void Mosaic::mousePressEvent(QMouseEvent *e)
             temp_point.setY(e->pos().y()/20*20 - 10);
         }
 
-        QRgb rgb = m_Image.pixel(temp_point);
+        QRgb rgb = m_ImageStart.pixel(temp_point);
         QColor color;
         color.setRgb(rgb);
         color.setAlpha(180);

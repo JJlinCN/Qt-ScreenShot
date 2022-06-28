@@ -1,3 +1,4 @@
+//author：pengyueting 2020051615252
 import QtQuick
 import QtQuick.Controls as QQC
 import Qt.labs.platform
@@ -5,7 +6,9 @@ import Qt.labs.platform
 
 
 Item {
-
+    function selectImage(){
+        scrollimg.source = arguments[0]
+    }//选择图片
     Column {
         id: leftside
         height: parent.height
@@ -85,6 +88,9 @@ Item {
                 icon.source: "qrc:/icons/mosaic.png"
                 width: 40
                 height: 40
+                onClicked: {
+                    filter.mosaic()
+                }
             }
 
             //滤镜
@@ -93,6 +99,64 @@ Item {
                 icon.source: "qrc:/icons/filter.png"
                 width: 40
                 height: 40
+                onClicked:filterMenu.popup(0,40)
+                QQC.Menu{
+                    id:filterMenu
+                    QQC.MenuItem{
+                        text:qsTr("灰度")
+                        onTriggered: {
+                            capture.filterGrey();
+                        }
+                    }
+                    QQC.MenuItem{
+                        text:qsTr("老照片")
+                        onTriggered: {
+                            capture.filterOld();
+                        }
+                    }
+                    QQC.MenuItem{
+                        text:qsTr("暖调")
+                        onTriggered: {
+                            capture.filterWarm();
+                        }
+                    }
+                    QQC.MenuItem{
+                        text:qsTr("冷调")
+                        onTriggered: {
+                            capture.filterCool();
+                        }
+                    }
+                    QQC.MenuItem{
+                        text:qsTr("模糊")
+                        onTriggered: {
+                            capture.filterVague();
+                        }
+                    }
+                    QQC.MenuItem{
+                        text:qsTr("反色")
+                        onTriggered: {
+                            capture.filterReverse();
+                        }
+                    }
+                    QQC.MenuItem{
+                        text:qsTr("锐化")
+                        onTriggered: {
+                            capture.filterSharpen();
+                        }
+                    }
+                    QQC.MenuItem{
+                        text:qsTr("柔化")
+                        onTriggered: {
+                            capture.filterSoften();
+                        }
+                    }
+                    QQC.MenuItem{
+                        text:qsTr("返回")
+                        onTriggered: {
+                            capture.filterSoften();
+                        }
+                    }
+                }
             }
 
             //撤销

@@ -4,12 +4,17 @@ import QtQuick.Layouts
 import QtQuick.Controls
 
 Item {
+    property alias check_3: check_3
     signal refreshImage()
     onRefreshImage: ()=>{
          img.source = ""
          img.source = "image://screen"
          /*img.source = "image://screen?id=" + count*/ //布尔值只是为了循环刷新路径触发provider中的requestimage函数返回缓存中的image图片到qml端显示
     }
+    function selectImage(){
+        img.source = arguments[0]
+    }//选择图片
+
     Image {
         id: img
         width: parent.width - recright.width
@@ -130,6 +135,7 @@ Item {
                     text: qsTr("隐藏当前窗口")
                 }
                 CheckBox {
+                    id: check_3
                     text: qsTr("手动保存或复制后退出")
                 }
             }
@@ -200,7 +206,13 @@ Item {
                         }
                     }
                     if(cbb.displayText===qsTr("长截图")){
-
+                        if(check_2.checked == true){
+                            root.hide()
+                            timer.setTimeout(function(){ longshot.show() },500)
+                            timer.setTimeout(function(){ root.show() },500)
+                        }else{
+                            longshot.show()
+                        }
                     }
                 }else{
                     countDown.start()
@@ -295,11 +307,13 @@ Item {
                     capture.startActiveShot()
                 }
             }else if(spinBox.value === 0 && cbb.currentText === qsTr("长截图")){
-//                countDown.stop()
-//                if(check_2.checked == true){
-//                    root.hide()
-//                    timer.setTimeout(function(){capture.captureLongPicture()} ,1000)
-//                }
+                countDown.stop()
+                if(check_2.checked == true){
+                    root.hide()
+                    timer.setTimeout(function(){ longshot.show() },500)
+                }else{
+                    longshot.show()
+                }
             }
         }
       }

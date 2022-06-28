@@ -8,7 +8,7 @@ class ImageProvider;
 class RectScreen;
 class MyLabel;
 class FreeCapture;
-
+class Filter;
 class Capture : public QMainWindow
 {
 Q_OBJECT
@@ -32,15 +32,29 @@ public slots:
     void startActiveShot();
     void startFullShot();
     void copyToClipboard(QImage image); //将内容复制到剪切板
+    void copyCurrentImageToClipboard();
     void startFreeShot();//不规则截图
     void nailedToTable(); //把图片钉在桌面上，是在矩形截图的默认功能下
     void cutNailScreen(QPixmap pixmap);//将钉在桌面上的图片显示出来。
-
+    //filter 滤镜方法
+    void filterRefresh(QImage img);
+    void filterGrey();
+    void filterOld();
+    void filterWarm();
+    void filterCool();
+    void filterVague();
+    void filterReverse();
+    void filterSharpen();
+    void filterSoften();
+    void filterUndo();
+    //保存图片
+    void saveImage(QString savePath);
 private:
 
 RectScreen *m_rectScreenShot;
 MyLabel *m_nailImage;
 FreeCapture *m_freeScreenShot;
+Filter *m_filter;
 //int m_captureCount;
 //QString m_path;
 };

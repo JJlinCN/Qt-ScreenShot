@@ -1,7 +1,7 @@
+//pengyueting 2020051615252
 #ifndef FILTER_H
 #define FILTER_H
-#include"ui_filter.h"
-#include"mosaic.h"
+//#include"mosaic.h"
 #include <QWidget>
 
 class Filter : public QWidget
@@ -10,16 +10,12 @@ class Filter : public QWidget
 
 public:
     explicit Filter(QWidget *parent = nullptr);
-    ~Filter();
 
     void coolImage(int delta);
     void warmImage(int delta);
-
-    Q_INVOKABLE void mosaic();
-
-private slots:
-    void on_open_clicked();
-
+    void setFilterImage(QImage img);
+    friend class Capture;
+private:
     void grey();
     void old();
     void warm();
@@ -28,12 +24,12 @@ private slots:
     void reverse();
     void sharpen();
     void soften();
-
-    void on_btn_saveas_clicked();
+    void undo();
+signals:
+    void sendFilterImage(QImage img);//接收image,将filter内存栈中img利用信号传递出去
 
 private:
-    Ui::Form *ui;
-    QImage m_Image;
-    QPixmap m_pixmap;     //像素图
+    QImage m_ImageStart;//转换前
+    QImage m_ImageFinal;//转换后
 };
 #endif // FILTER_H

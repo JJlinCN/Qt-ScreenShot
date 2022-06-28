@@ -1,7 +1,6 @@
 #ifndef MOSAIC_H
 #define MOSAIC_H
 #include<QWidget>
-#include"ui_mosaic.h"
 
 class Mosaic:public QWidget
 {
@@ -15,17 +14,18 @@ public:
     ~Mosaic();
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
+    void setMosaicImage(QImage img);
+signals:
+    void sendMosaicImage(QImage img);
 private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
 
     void on_pushButton_3_clicked();
-
 private:
-    Ui_Form2 *ui;
-    QImage m_Image;
-    QPixmap m_pixmap;
+    QImage m_ImageStart;
+    QImage m_ImageFinal;
     QPoint m_point;
     QPoint m_oldPoint;
 };

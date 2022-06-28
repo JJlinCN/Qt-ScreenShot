@@ -1,3 +1,4 @@
+//author：pengyueting 2020051615252
 import QtQuick
 import QtQuick.Controls
 

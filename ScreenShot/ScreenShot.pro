@@ -12,11 +12,12 @@ SOURCES += \
     capture.cpp \
     filter.cpp \
     freecapture.cpp \
+    gifwidget.cpp \
     longshot.cpp \
         main.cpp \
-    mosaic.cpp \
     mylabel.cpp \
         recscreen.cpp \
+    share.cpp
 
 resources.files = main.qml 
 resources.prefix = /$${TARGET}
@@ -35,20 +36,21 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    Gif.h \
     capture.h \
     filter.h \
     freecapture.h \
+    gifwidget.h \
     imgprovider.h \
     longshot.h \
     RecScreen.h \
 FORMS += \
-    mosaic.h \
-    mylabel.h
+    mylabel.h \
+    share.h
 
 DISTFILES += \
     MainContent.qml
 
 FORMS += \
-    filter.ui \
     form.ui \
-    mosaic.ui
+    form2.ui

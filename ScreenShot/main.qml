@@ -68,6 +68,9 @@ ApplicationWindow {
                                 sequence: "Ctrl+?"
                                 onActivated: btn_help.triggered()
                             }
+                            onTriggered: {
+                                dialogs.openAboutDialog()
+                            }
                         }
                         MenuItem {
                             id: btn_error
@@ -88,6 +91,9 @@ ApplicationWindow {
                                 sequence: "Ctrl+Shift+H"
                                 onActivated: btn_about.triggered()
                             }
+                            onTriggered: ()=>{
+                                             dialogs.openAboutDialog()
+                                         }
                         }
                     }
                 }
@@ -100,6 +106,9 @@ ApplicationWindow {
                         sequence: "Ctrl+O"
                         onActivated: btn_open.clicked()
                     }
+                    onClicked: ()=>{
+                                   dialogs.openFileDialog()
+                               }
                 }
             }
 
@@ -148,6 +157,9 @@ ApplicationWindow {
                         sequence: "Ctrl+P"
                         onActivated: btn_1.clicked()
                     }
+                    onClicked: {
+                            share.startPrint()
+                    }
                 }
 
                 Button {
@@ -168,18 +180,30 @@ ApplicationWindow {
                                 id: btn_qq
                                 text: qsTr("发送到QQ")
                                 icon.source: "./icons/qq.png"
+                                onTriggered: {
+                                    share.shareToQQ()
+                                }
                             }
                             MenuItem {
                                 text: qsTr("发送到微信")
                                 icon.source: "./icons/wexin.png"
+                                onTriggered: {
+                                    share.shareToWeXin()
+                                }
                             }
                             MenuItem {
                                 text: qsTr("通过电子邮件发送...")
                                 icon.source: "./icons/mail.png"
+                                onTriggered: {
+                                    share.sendByEmail()
+                                }
                             }
                             MenuItem {
                                 text: qsTr("发送到设备")
                                 icon.source: "./icons/phone.png"
+                                onTriggered: {
+                                    share.startPrint()
+                                }
                             }
                         }
                         Menu {
@@ -192,6 +216,9 @@ ApplicationWindow {
                                     sequence: "Ctrl+Shift+R"
                                     onActivated: btn_record.triggered()
                                 }
+                                onTriggered: {
+                                    gifwidget.show()
+                                }
                             }
                             MenuItem {
                                 id: btn_areaRecord
@@ -200,6 +227,9 @@ ApplicationWindow {
                                 Shortcut {
                                     sequence: "Ctrl+Shift+A"
                                     onActivated: btn_areaRecord.triggered()
+                                }
+                                onTriggered: {
+                                    gifwidget.show()
                                 }
                             }
                         }
@@ -214,6 +244,12 @@ ApplicationWindow {
                         sequence: "Ctrl+Shift+C"
                         onActivated: btn_4.clicked()
                     }
+                    onClicked:()=>{
+                                  capture.copyCurrentImageToClipboard()
+                                  if(maincontent.check_3.checkState==Qt.Checked){
+                                      root.close()
+                                  }
+                              }
                 }
                 Button {
                     id: btn_3
@@ -242,10 +278,26 @@ ApplicationWindow {
                                 sequence: "Ctrl+Shift+S"
                                 onActivated: save_as.triggered()
                             }
+                            onTriggered: ()=>{
+                                             dialogs.saveFileDialog()
+                                             if(maincontent.check_3.checkState==Qt.Checked){
+                                                 root.close()
+                                             }
+                                         }
                         }
                     }
                 }
             }
+        }
+    }
+    Dialogs{
+        id:dialogs
+        fileOpenDialog.onAccepted: {
+            maincontent.selectImage(fileOpenDialog.selectedFile)
+            annotation.selectImage(fileOpenDialog.selectedFile)
+        }
+        fileSaveDialog.onAccepted: {
+            capture.saveImage(fileSaveDialog.selectedFile)
         }
     }
 }

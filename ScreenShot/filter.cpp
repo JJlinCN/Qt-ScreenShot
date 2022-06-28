@@ -1,5 +1,5 @@
+//pengyueting 2020051615252
 #include "filter.h"
-
 #include <math.h>
 #include <stdio.h>
 #include <iostream>
@@ -7,43 +7,24 @@
 #include <QFileDialog>
 
 Filter::Filter(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Form)
+    QWidget(parent)
 {
-    ui->setupUi(this);
     update();
 
     setWindowTitle("滤镜");
 
     //m_Image.load("/root/MyProject/2.jpg");
-    m_pixmap = QPixmap::fromImage(m_Image).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label->setPixmap(m_pixmap);
-    ui->label->setScaledContents(true);
-
-    connect(ui->btn_grey,SIGNAL(clicked()),this,SLOT(grey()));
-    connect(ui->btn_cool,SIGNAL(clicked()),this,SLOT(cool()));
-    connect(ui->btn_warm,SIGNAL(clicked()),this,SLOT(warm()));
-    connect(ui->btn_old,SIGNAL(clicked()),this,SLOT(old()));
-    connect(ui->btn_vague,SIGNAL(clicked()),this,SLOT(vague()));
-    connect(ui->btn_reverse,SIGNAL(clicked()),this,SLOT(reverse()));
-    connect(ui->btn_sharpen,SIGNAL(clicked()),this,SLOT(sharpen()));
-    connect(ui->btn_soften,SIGNAL(clicked()),this,SLOT(soften()));
-}
-
-Filter::~Filter()
-{
-    delete ui;
 }
 
 void Filter::coolImage(int delta)
 {
-    QImage tmp = m_Image.copy();
+    m_ImageFinal = m_ImageStart.copy();//深拷贝
 
     int r,g,b;
     QColor frontColor;
-    for(int x=0; x<tmp.width(); x++){
-        for(int y=0; y<tmp.height(); y++){
-            frontColor = QColor(m_Image.pixel(x,y));
+    for(int x=0; x<m_ImageFinal.width(); x++){
+        for(int y=0; y<m_ImageFinal.height(); y++){
+            frontColor = QColor(m_ImageStart.pixel(x,y));
 
             r = frontColor.red();
             g = frontColor.green();
@@ -52,25 +33,22 @@ void Filter::coolImage(int delta)
             //we check if the new value is between 0 and 255
             b = qBound(0, b, 255);
 
-            tmp.setPixel(x,y, qRgb(r,g,b));
+            m_ImageFinal.setPixel(x,y, qRgb(r,g,b));
         }
     }
-
-    m_pixmap = QPixmap::fromImage(tmp).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label_2->setPixmap(m_pixmap);
-    ui->label_2->setScaledContents(true);
     update();
+    emit sendFilterImage(m_ImageFinal); //将修改后的图片发送出去
 }
 
 void Filter::warmImage(int delta)
 {
-    QImage tmp = m_Image.copy();
+    QImage m_ImageFinal = m_ImageStart.copy();
 
     int r,g,b;
     QColor frontColor;
-    for(int x=0; x<tmp.width(); x++){
-        for(int y=0; y<tmp.height(); y++){
-            frontColor = QColor(m_Image.pixel(x,y));
+    for(int x=0; x<m_ImageFinal.width(); x++){
+        for(int y=0; y<m_ImageFinal.height(); y++){
+            frontColor = QColor(m_ImageStart.pixel(x,y));
 
             r = frontColor.red()+delta;
             g = frontColor.green()+delta;
@@ -80,51 +58,41 @@ void Filter::warmImage(int delta)
             r = qBound(0, r, 255);
             g = qBound(0,g,255);
 
-            tmp.setPixel(x,y, qRgb(r,g,b));
+            m_ImageFinal.setPixel(x,y, qRgb(r,g,b));
         }
     }
-    m_pixmap = QPixmap::fromImage(tmp).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label_2->setPixmap(m_pixmap);
-    ui->label_2->setScaledContents(true);
     update();
-}
-
-void Filter::mosaic()
-{
-    Mosaic *mosaic = new Mosaic();
-    mosaic->show();
+    emit sendFilterImage(m_ImageFinal);
 }
 
 //灰度
 void Filter::grey()
 {
     //    m_Image.load("/root/images/04.jpg");
-    QImage tmp = m_Image.copy();
-    for (int i = 0; i < m_Image.width(); i++)
+    m_ImageFinal = m_ImageStart.copy();
+    for (int i = 0; i < m_ImageStart.width(); i++)
     {
-        for (int j = 0; j < m_Image.height(); j++)
+        for (int j = 0; j < m_ImageStart.height(); j++)
         {
-            QColor oriColor = m_Image.pixel(i, j);
+            QColor oriColor = m_ImageStart.pixel(i, j);
             int average = (oriColor.red() + oriColor.green() + oriColor.blue()) / 3;
             oriColor = QColor(average, average, average);
-            tmp.setPixelColor(i, j, oriColor);
+            m_ImageFinal.setPixelColor(i, j, oriColor);
         }
     }
-    m_pixmap = QPixmap::fromImage(tmp).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label_2->setPixmap(m_pixmap);
-    ui->label_2->setScaledContents(true);
     update();
+    emit sendFilterImage(m_ImageFinal);
 }
 
 //老照片
 void Filter::old()
 {
-    QImage tmp = m_Image.copy();
+    m_ImageFinal = m_ImageStart.copy();
 
     QColor frontColor;
-    for(int x=0; x<tmp.width(); x++){
-        for(int y=0; y<tmp.height(); y++){
-            frontColor = QColor(m_Image.pixel(x,y));
+    for(int x=0; x<m_ImageFinal.width(); x++){
+        for(int y=0; y<m_ImageFinal.height(); y++){
+            frontColor = QColor(m_ImageStart.pixel(x,y));
 
             int r = 0.393 * frontColor.red() + 0.769 * frontColor.green() + 0.189 * frontColor.blue();
             int g = 0.349 * frontColor.red() + 0.686 * frontColor.green() + 0.168 * frontColor.blue();
@@ -133,25 +101,11 @@ void Filter::old()
             g = qBound(0, g, 255);
             b = qBound(0, b, 255);
 
-            tmp.setPixel(x,y, qRgb(r,g,b));
+            m_ImageFinal.setPixel(x,y, qRgb(r,g,b));
         }
     }
-
-    m_pixmap = QPixmap::fromImage(tmp).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label_2->setPixmap(m_pixmap);
-    ui->label_2->setScaledContents(true);
     update();
-}
-
-//打开
-void Filter::on_open_clicked()
-{
-    QString path=QFileDialog::getOpenFileName();
-    m_Image.load(path);
-    m_pixmap = QPixmap::fromImage(m_Image).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label->setPixmap(m_pixmap);
-    ui->label->setScaledContents(true);
-    update();
+    emit sendFilterImage(m_ImageFinal);
 }
 
 //暖调
@@ -169,7 +123,7 @@ void Filter::cool()
 //模糊
 void Filter::vague()
 {
-    mosaic();
+//    mosaic();
     int kernel [5][5]= {{0,0,1,0,0},
                         {0,1,3,1,0},
                         {1,3,7,3,1},
@@ -180,9 +134,9 @@ void Filter::vague()
     int r,g,b;
     QColor color;
 
-    QImage tmp = m_Image.copy();
-    for(int x=kernelSize/2; x<tmp.width()-(kernelSize/2); x++){
-        for(int y=kernelSize/2; y<tmp.height()-(kernelSize/2); y++){
+    m_ImageFinal = m_ImageStart.copy();
+    for(int x=kernelSize/2; x<m_ImageFinal.width()-(kernelSize/2); x++){
+        for(int y=kernelSize/2; y<m_ImageFinal.height()-(kernelSize/2); y++){
 
             r = 0;
             g = 0;
@@ -190,7 +144,7 @@ void Filter::vague()
 
             for(int i = -kernelSize/2; i<= kernelSize/2; i++){
                 for(int j = -kernelSize/2; j<= kernelSize/2; j++){
-                    color = QColor(m_Image.pixel(x+i, y+j));
+                    color = QColor(m_ImageStart.pixel(x+i, y+j));
                     r += color.red()*kernel[kernelSize/2+i][kernelSize/2+j];
                     g += color.green()*kernel[kernelSize/2+i][kernelSize/2+j];
                     b += color.blue()*kernel[kernelSize/2+i][kernelSize/2+j];
@@ -201,39 +155,33 @@ void Filter::vague()
             g = qBound(0, g/sumKernel, 255);
             b = qBound(0, b/sumKernel, 255);
 
-            tmp.setPixel(x,y, qRgb(r,g,b));
+            m_ImageFinal.setPixel(x,y, qRgb(r,g,b));
         }
     }
-
-    m_pixmap = QPixmap::fromImage(tmp).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label_2->setPixmap(m_pixmap);
-    ui->label_2->setScaledContents(true);
     update();
+    emit sendFilterImage(m_ImageFinal);
 }
 
 //反色
 void Filter::reverse()
 {
-    QImage tmp = m_Image.copy();
+    m_ImageFinal = m_ImageStart.copy();
 
     int r,g,b;
     QColor frontColor;
-    for(int x=0; x<tmp.width(); x++){
-        for(int y=0; y<tmp.height(); y++){
-            frontColor = QColor(m_Image.pixel(x,y));
+    for(int x=0; x<m_ImageFinal.width(); x++){
+        for(int y=0; y<m_ImageFinal.height(); y++){
+            frontColor = QColor(m_ImageStart.pixel(x,y));
 
             r = frontColor.red();
             g = frontColor.green();
             b = frontColor.blue();
 
-            tmp.setPixel(x,y, qRgb(255-r,255-g,255-b));
+            m_ImageFinal.setPixel(x,y, qRgb(255-r,255-g,255-b));
         }
     }
-
-    m_pixmap = QPixmap::fromImage(tmp).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label_2->setPixmap(m_pixmap);
-    ui->label_2->setScaledContents(true);
     update();
+    emit sendFilterImage(m_ImageFinal);
 }
 
 //锐化
@@ -247,9 +195,9 @@ void Filter::sharpen()
     int r,g,b;
     QColor color;
 
-    QImage tmp = m_Image.copy();
-    for(int x=kernelSize/2; x<tmp.width()-(kernelSize/2); x++){
-        for(int y=kernelSize/2; y<tmp.height()-(kernelSize/2); y++){
+    m_ImageFinal = m_ImageStart.copy();
+    for(int x=kernelSize/2; x<m_ImageFinal.width()-(kernelSize/2); x++){
+        for(int y=kernelSize/2; y<m_ImageFinal.height()-(kernelSize/2); y++){
 
             r = 0;
             g = 0;
@@ -257,7 +205,7 @@ void Filter::sharpen()
 
             for(int i = -kernelSize/2; i<= kernelSize/2; i++){
                 for(int j = -kernelSize/2; j<= kernelSize/2; j++){
-                    color = QColor(tmp.pixel(x+i, y+j));
+                    color = QColor(m_ImageFinal.pixel(x+i, y+j));
                     r += color.red()*kernel[kernelSize/2+i][kernelSize/2+j];
                     g += color.green()*kernel[kernelSize/2+i][kernelSize/2+j];
                     b += color.blue()*kernel[kernelSize/2+i][kernelSize/2+j];
@@ -268,25 +216,23 @@ void Filter::sharpen()
             g = qBound(0, g/sumKernel, 255);
             b = qBound(0, b/sumKernel, 255);
 
-            tmp.setPixel(x,y, qRgb(r,g,b));
+            m_ImageFinal.setPixel(x,y, qRgb(r,g,b));
 
         }
     }
-    m_pixmap = QPixmap::fromImage(tmp).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label_2->setPixmap(m_pixmap);
-    ui->label_2->setScaledContents(true);
     update();
+    emit sendFilterImage(m_ImageFinal);
 }
 
 //柔化
 void Filter::soften()
 {
 
-    QImage tmp = m_Image.copy();
+    m_ImageFinal = m_ImageStart.copy();
     int r,g,b;
     QRgb color;
-    for(int x=1; x<tmp.width()-1; x++){
-        for(int y=1; y<tmp.height()-1; y++){
+    for(int x=1; x<m_ImageFinal.width()-1; x++){
+        for(int y=1; y<m_ImageFinal.height()-1; y++){
             r = 0; g = 0; b = 0;
             for(int m = 0; m < 9; m++)
             {
@@ -303,7 +249,7 @@ void Filter::soften()
                     case 7: s = x - 1;  p = y ;  break;
                     case 8: s = x;  p = y;  break;
                 }
-                color = tmp.pixel(s, p);
+                color = m_ImageFinal.pixel(s, p);
                 r += qRed(color);
                 g += qGreen(color);
                 b += qBlue(color);
@@ -317,21 +263,18 @@ void Filter::soften()
             g = qMin(255, qMax(0, g));
             b = qMin(255, qMax(0, b));
 
-            tmp.setPixel(x, y, qRgb(r, g, b));
+            m_ImageFinal.setPixel(x, y, qRgb(r, g, b));
         }
     }
-
-    m_pixmap = QPixmap::fromImage(tmp).scaled(size(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->label_2->setPixmap(m_pixmap);
-    ui->label_2->setScaledContents(true);
     update();
+    emit sendFilterImage(m_ImageFinal);
 }
 
-//保存修改的图片
-void Filter::on_btn_saveas_clicked()
-{
-    QString path=QFileDialog::getSaveFileName(this,tr("另存为"),tr(""),tr("图片(*.png *.jpeg *.jpg)"));
-    m_pixmap.save(path);
+void Filter::setFilterImage(QImage img){
+    m_ImageStart = img.copy();
 }
 
-
+void Filter::undo(){
+    m_ImageFinal = m_ImageStart.copy(m_ImageStart.rect());//将初始截取图片的深拷贝给修改后图片
+    emit sendFilterImage(m_ImageFinal);
+}
