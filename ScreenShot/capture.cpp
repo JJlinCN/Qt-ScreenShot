@@ -9,7 +9,7 @@
 #include <KWindowSystem>
 #include <QDebug>
 
-Capture::Capture(QMainWindow *parent):QMainWindow(parent)/*,m_captureCount{0}*//*,m_path{"/temp/"}*/{
+Capture::Capture(QMainWindow *parent):QMainWindow(parent),m_captureCount{0},m_path{"/temp/"}{
 
     imageProvider = new ImageProvider;
     m_filter = new Filter;//所有滤镜操作应共享一个滤镜器及其资源,每次截取会把截取到的图片设置为滤镜器的初始图片，滤镜则是复制一份初始图片进行修改，方便回退初始图片undo
@@ -113,9 +113,9 @@ void Capture::cutScreen(QPixmap capturePixmap){
     imageProvider->image=image;
     m_filter->setFilterImage(imageProvider->image);
     copyToClipboard(image);
-    //m_captureCount ++ ;
-    //QString path = m_path + QString("%1.jpg").arg(m_captureCount);
-   // image.save(path);
+//    m_captureCount ++ ;
+//    QString path = m_path + QString("%1.jpg").arg(m_captureCount);
+//    image.save(path);
     emit finishCapture();
     emit callImageChanged();
 }
@@ -188,6 +188,7 @@ void Capture::filterUndo(){
 }
 
 void Capture::saveImage(QString savePath){
+    //因为在qml端和系统的文件管理路径有差异，所以将从qml端对话框返回的路径以c++端可识别的路径来重新获取
     QString realSavePath;
     for(int i=7;i<savePath.size();i++){
         realSavePath.push_back(savePath.at(i));

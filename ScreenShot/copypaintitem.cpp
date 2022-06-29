@@ -16,6 +16,8 @@ void CopyPaintItem::save(QString filepath)
     qDebug()<<"qml中传过来的路径是"<<filepath;
     copyPainter=new QPainter(&m_image);
     copyPainter->setRenderHint(QPainter::Antialiasing,true);
+
+    //元素保存的原理是将qml端绘制的元素，传到这个类中，进行重新绘制一遍并且保存
     paintEvent(nullptr);
     QString path;
     for(int i=7;i<filepath.size();i++){

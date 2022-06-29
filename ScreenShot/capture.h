@@ -1,3 +1,7 @@
+/*
+author:huangyihong pengyueting longxinping
+date:2022/6/29
+*/
 #ifndef CAPTURE_H
 #define CAPTURE_H
 #include<QMainWindow>
@@ -55,8 +59,9 @@ RectScreen *m_rectScreenShot;
 MyLabel *m_nailImage;
 FreeCapture *m_freeScreenShot;
 Filter *m_filter;
-//int m_captureCount;
-//QString m_path;
+
+int m_captureCount;//用来完成连续截图，计数截下图片的数量
+QString m_path; //在文件系统中图片存储的默认路径
 };
 
 #endif // CAPTURE_H
