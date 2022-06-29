@@ -1,3 +1,25 @@
+/*
+ * This class is responsible for various interactions between C + + and QML
+ *
+ * author: 李梦雪 梁淑贞 张宝丹
+ * email：2304768518@qq.com 2239602082@qq.com 1395089569@qq.com
+ * time:2021.10
+
+ * Copyright (C) <2021>  <Mengxue Li,Shuzhen Liang,Baodan zhang>
+
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef PAINTEDITEM_H
 #define PAINTEDITEM_H
@@ -18,7 +40,6 @@ class PaintedItem : public QQuickPaintedItem
 
     //涂鸦的目标图片
     Q_PROPERTY(QImage myImage READ myImage WRITE setMyImage)
-
     Q_PROPERTY(QUrl mysource READ mysource WRITE setMysource)
 
     //是否触发相应的涂鸦事件
@@ -34,13 +55,10 @@ class PaintedItem : public QQuickPaintedItem
 
     //文字所在矩形的宽度
     Q_PROPERTY(int textWidth READ textWidth WRITE setTextWidth NOTIFY textWidthChanged)
-    //所在矩形框高度
-    Q_PROPERTY(int textHeight READ textHeight WRITE setTextHeight NOTIFY textHeightChanged)
 
     //矩形|椭圆形|直线的起始点与终止点
     Q_PROPERTY(QPoint startPoint READ startPoint WRITE setStartPoint NOTIFY startPointChanged)
     Q_PROPERTY(QPoint lastPoint READ lastPoint WRITE setLastPoint NOTIFY lastPointChanged)
-
     //文字以及键盘输入文字的起始点
     Q_PROPERTY(QString textEdit READ textEdit WRITE settextEdit NOTIFY textEditChanged)
     Q_PROPERTY(QPoint printPoint READ printPoint WRITE setprintPoint NOTIFY printPointChanged)
@@ -50,14 +68,10 @@ class PaintedItem : public QQuickPaintedItem
 
     //当前进行的编辑操作是什么
     Q_PROPERTY(int  flag READ flag WRITE setFlag NOTIFY flagChanged);
-
     QML_ELEMENT
 public:
-
     PaintedItem(QQuickItem *parent = 0);
     ~PaintedItem();
-
-
 
     //清除、撤销、保存
     Q_INVOKABLE void clear();
@@ -67,21 +81,15 @@ public:
 
     //设置剪切矩形
     Q_INVOKABLE void sendRectNumber(int x,int y,int width,int height);
-
     //undo或clear后，将图片恢复特定样子，flag为标志，"clear"为恢复为最开始大小和位置，“undo”恢复为最近一次大小和位置
     Q_INVOKABLE QRectF undo_backRect(QString flag);
-
     //如果是剪切操作向m_sequence里push_back(6),6表示剪切
     Q_INVOKABLE void pressCutSequence();
-
     //查看m_sequence里的最后一个值，如果是6,返回bool值true,否则返回false。flag标志，“clear”表示清除，“undo”表示撤销，根据此进行特定的操作
     Q_INVOKABLE bool isdoCut(QString flag);
 
     //彻底清除m_rects里面的矩形
     Q_INVOKABLE void destroyRect();
-
-
-
 
     //每次调用update()函数时就会调用paint函数进行画布的更新
     void paint(QPainter *painter);
@@ -115,10 +123,6 @@ public:
         return m_textWidth;
     }
 
-    int textHeight()const
-    {
-        return m_textHeight;
-    }
     QColor textColor() const
     {
         return m_textPen.color();
@@ -140,7 +144,6 @@ public:
     }
 
     void setTextWidth(int newTextWidth);
-    void setTextHeight(int newTextHeight);
 
 signals:
     void clearSignal();
@@ -168,8 +171,6 @@ signals:
     void textFontChanged(int textFont);
 
     void textWidthChanged();
-
-    void textHeightChanged();
 
 public slots:
     void setEnabled(bool enabled){ m_bEnabled = enabled; }
@@ -215,7 +216,7 @@ public slots:
 //        qDebug()<<"on_textEdit_changed:"<<&m_textElement;
         if(m_flag==1&&m_textElement!=nullptr){
             //改变文字
-            //m_textElement->m_content=m_textEdit;
+            m_textElement->m_text=m_textEdit;
 
             //update两次会发生什么报错？？
 //            update();
@@ -351,8 +352,8 @@ private:
     QVector<LineElement*> m_lineElements;
 
     //涂鸦
-    DoodleElement *m_doodleElement;
-    QVector<DoodleElement*> m_doodleElements;
+    Doodle *m_doodleElement;
+    QVector<Doodle*> m_doodleElements;
 
 //    //剪切矩形
 //    CutRectElement* m_rectCut;
@@ -362,7 +363,7 @@ private:
 
     //文字区域的宽度
     int m_textWidth;
-    int m_textHeight;
+
     //当前所进行的编辑操作，1是文字，2是椭圆,3是矩形，4是直线,5是涂鸦
     int m_flag=0;
 

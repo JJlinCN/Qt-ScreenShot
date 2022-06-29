@@ -1,4 +1,4 @@
-#include "paintitem.h"
+#include "painteditem.h"
 #include <QPainter>
 #include <QPen>
 #include <QBrush>
@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <elementgroup.h>
 #include <QQuickWindow>
-#include "copypainteditem.h"
+#include "copypaintitem.h"
 
 PaintedItem::PaintedItem(QQuickItem *parent)
     : QQuickPaintedItem(parent)
@@ -24,6 +24,13 @@ PaintedItem::PaintedItem(QQuickItem *parent)
     setAcceptedMouseButtons(Qt::LeftButton);
     connect(this,&PaintedItem::textEditChanged,this,&PaintedItem::on_textEdit_changed);
     connect(this,&PaintedItem::textFontChanged,this,&PaintedItem::on_textFont_changed);
+    m_sequence.clear();
+    m_textElements.clear();
+    m_circleElements.clear();
+    m_rectElements.clear();
+    m_lineElements.clear();
+    m_doodleElements.clear();
+    m_rects.clear();
 }
 
 PaintedItem::~PaintedItem()
@@ -43,11 +50,10 @@ void PaintedItem::clear()
 void PaintedItem::undo()
 {
     if(m_sequence.size()!=0){
-        //最后一个操作的标记是什么
         int i=m_sequence[m_sequence.size()-1];
-        if(i==1){ //是文字编辑
+        if(i==1){
             if(m_textElements.size()>0){
-                m_textElements.takeLast();
+                delete m_textElements.takeLast();//拿走最后一个成员,释放该成员内存
                 //                delete m_textElements.takeLast();
             }
         }else if(i==2){
@@ -70,13 +76,11 @@ void PaintedItem::undo()
         m_sequence.removeLast();
     }
     emit undoSignal();
-    update();  //
+    update();
 }
 
 void PaintedItem::save(QString filePath)
 {
-
-    //保存是将进行了编辑的文字进行保存，使用了一个专门的保存类
     //    copyPainter=new CopyPaintItem();
     //    copyPainter->CopyPaint(m_elements,m_myImage,m_textElements);
     CopyPaintItem* copyPainter=new CopyPaintItem();
@@ -111,40 +115,38 @@ void PaintedItem::paint(QPainter *painter)
 
 void PaintedItem::mousePressEvent(QMouseEvent *event)
 {
-    m_bMoved = false;
-    //如果m_bEnabled为false或者所用键盘与设置的键盘不一样，就不会触发鼠标按压事件
-    if(!m_bEnabled || !(event->button() & acceptedMouseButtons())){
-        QQuickPaintedItem::mousePressEvent(event);
-    }else{
-        qDebug() << "mouse pressed";
-        m_bPressed = true;
-        event->setAccepted(true);
-        if(m_flag==1){        //如果是编辑文字
-            textPressEvent();
-            m_sequence.push_back(1);
-        }else if(m_flag==2){
-            qDebug()<<"画椭圆";
-            circlePressEvent();   //如果是画椭圆
-            m_sequence.push_back(2);
-        }else if(m_flag==3){
-            rectPressEvent();//画矩形
-            m_sequence.push_back(3);
-        }else if(m_flag==4){
-            linePressEvent();
-            m_sequence.push_back(4);
-        }else if(m_flag==5){
-            doodlePressEvent();//涂鸦
-            m_sequence.push_back(5);
-        }else if(m_flag==6){   //剪切
-            m_sequence.push_back(6);
+        m_bMoved = false;
+        //如果m_bEnabled为false或者所用键盘与设置的键盘不一样，就不会触发鼠标按压事件
+        if(!m_bEnabled || !(event->button() & acceptedMouseButtons())){
+            QQuickPaintedItem::mousePressEvent(event);
+        }else{
+            qDebug() << "mouse pressed";
+            m_bPressed = true;
+            event->setAccepted(true);
+            if(m_flag==1){        //如果是编辑文字
+                textPressEvent();
+                m_sequence.push_back(1);
+            }else if(m_flag==2){
+                qDebug()<<"画椭圆";
+                circlePressEvent();   //如果是画椭圆
+                m_sequence.push_back(2);
+            }else if(m_flag==3){
+                rectPressEvent();//画矩形
+                m_sequence.push_back(3);
+            }else if(m_flag==4){
+                linePressEvent();
+                m_sequence.push_back(4);
+            }else if(m_flag==5){
+                doodlePressEvent();//涂鸦
+                m_sequence.push_back(5);
+            }else if(m_flag==6){   //剪切
+                m_sequence.push_back(6);
+            }
+            //设置起始点
+            qDebug()<<"event->pos"<<event->pos().x()<<"+"<<event->pos().y();
+            setStartPoint(event->pos());
+            update();
         }
-        //设置起始点
-        qDebug()<<"event->pos"<<event->pos().x()<<"+"<<event->pos().y();
-
-        setStartPoint(event->pos());
-
-        update();
-    }
 }
 
 void PaintedItem::mouseMoveEvent(QMouseEvent *event)
@@ -160,7 +162,7 @@ void PaintedItem::mouseMoveEvent(QMouseEvent *event)
         setLastPoint(event->pos());
         if(m_flag==1){//如果是编辑文字
             textMoveEvent();
-           // qDebug()<<"鼠标移动时文字为"<<m_textElement->m_content;
+            qDebug()<<"鼠标移动时文字为"<<m_textElement->m_text;
         }else if(m_flag==2){
             circleMoveEvent();  //如果是画椭圆
         }else if(m_flag==3){
@@ -174,7 +176,7 @@ void PaintedItem::mouseMoveEvent(QMouseEvent *event)
         }
 
         update();
-    }
+        }
 }
 void PaintedItem::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -187,12 +189,7 @@ void PaintedItem::mouseReleaseEvent(QMouseEvent *event)
         setLastPoint(event->pos());
 
         if(m_flag==1){//如果是编辑文字事件
-
-            //文字编辑事件，一旦鼠标释放了，完成文字框的设置，立马生成文字框
             textMoveEvent();
-            m_textElement->myText = new Text;
-            m_textElement->myText->setGeometry(m_startPoint.x(),m_startPoint.y(),m_textWidth,m_textHeight);
-            m_textElement->myText->setMaximumWidth(m_textWidth);
         }else if(m_flag==2){
             circleMoveEvent();//如果是画椭圆
         }else if(m_flag==3){
@@ -209,23 +206,20 @@ void PaintedItem::mouseReleaseEvent(QMouseEvent *event)
         m_bPressed=false;
         m_bMoved=false;
         settextEdit("");
-    }
+        }
 }
 
 void PaintedItem::textPressEvent()
 {
-    //关键点，新建一个文字编辑的类，用当前的画笔，文字笔，文字大小来初始化
-    m_textElement=new TextElement(m_pen,m_textPen,m_textFont);
+    //关键点，新建一个文字编辑的类
+    m_textElement=new TextElement(m_pen,m_textPen,m_textFont,"");
     qDebug()<<"新建了一个文字编辑的类";
-    //qDebug()<<"文字编辑类的text为："<<m_textElement->m_content;
-
-    //把这个文字编辑的信息放入一个容器内，出现undo或者clear事件是，可以回到原来的配置
+    qDebug()<<"文字编辑类的text为："<<m_textElement->m_text;
     m_textElements.push_back(m_textElement);
 
     //将PaintedItem类中的textEdit的值变为空
     //目的是更新qml中textedit中text的值
-    //文字编辑框中有一个文本框了，不需要在重新设置文本，文本框开始的文本默认为空
-    //settextEdit("");
+    settextEdit("");
 }
 
 void PaintedItem::circlePressEvent()
@@ -252,26 +246,22 @@ void PaintedItem::linePressEvent()
 void PaintedItem::doodlePressEvent()
 {
     //新建一个涂鸦的类
-    m_doodleElement=new DoodleElement(m_pen);
+    m_doodleElement=new Doodle(m_pen);
     m_doodleElements.push_back(m_doodleElement);
 }
 
 void PaintedItem::textPaintEvent(QPainter *painter)
 {
-    //获得所有的文字编辑框。由于qml中无法保存上一次绘画的图形，所以将每次绘制的图形存储在集合中
-    //每次鼠标的时间都会出发重新绘制，将之前所有的图形都再绘制一次
     int size = m_textElements.size();
     for(int i = 0; i < size; ++i){
         TextElement* textElement = m_textElements.at(i);
 
-        int endSize=textElement->m_endPoints.size();
-        if(endSize>0&&(textElement!=nullptr)){
-            QPoint lastPoint=textElement->m_endPoints[endSize-1];
+//        int endSize=textElement->m_endPoints.size();
+//        if(endSize>0&&(textElement!=nullptr)){
+            QPoint lastPoint=textElement->m_endPoints;
             QPoint startPoint=textElement->m_startPoint;
             QRect rect;
-
-            //因为矩形的绘制是由左上角的点为开始点，右下角的点为结束点，所以要考虑不同的鼠标绘制走向，表示出正确绘制矩形的开始点和结束点
-            QPoint p,p1;//装最后确定的矩形的开始点和结束点来绘制矩形
+            QPoint p,p1;
             // 确定起始点和终止点的位置
             if(startPoint.x()>lastPoint.x()&&startPoint.y()<lastPoint.y()){
                 qDebug()<<"第二种情况";
@@ -302,21 +292,18 @@ void PaintedItem::textPaintEvent(QPainter *painter)
             QRect rec(p,p1);
             rect=rec;
 
-
-            //设置画笔，用text中的画笔来绘制这个矩形
-            painter->setPen(textElement->m_framePen);
-            //画这个矩形框
+            //设置画笔
+            painter->setPen(textElement->m_recPen);
+            //画一个矩形
             painter->drawRect(rect);
-
             //设置文字的画笔
-            //painter->setPen(textElement->m_textPen);
-//            QFont font;
-//            font.setPixelSize(textElement->m_font);
-//            painter->setFont(font);
-            //不用设置里面的内容，矩形框中装有一个textedit对象，实验期，看是否成功
-           // painter->drawText(rect,textElement->m_content);
+            painter->setPen(textElement->m_textPen);
+            QFont font;
+            font.setPixelSize(textElement->m_font);
+            painter->setFont(font);
+            painter->drawText(rect,textElement->m_text);
         }
-    }
+//    }
 }
 
 void PaintedItem::circlePaintEvent(QPainter *painter)
@@ -326,13 +313,13 @@ void PaintedItem::circlePaintEvent(QPainter *painter)
     for(int i=0;i<size;i++){
         CircleElement *circleElement=m_circleElements[i];
         painter->setPen(circleElement->m_pen);
-        int maxSize=circleElement->m_endPoints.size();
-        if(maxSize>0&&(circleElement!=nullptr)){
+//        int maxSize=circleElement->m_endPoints.size();
+//        if(maxSize>0&&(circleElement!=nullptr)){
             //椭圆要求在一个矩形区域内
-            QRect rect(circleElement->m_startPoint,circleElement->m_endPoints[maxSize-1]);
+            QRect rect(circleElement->m_startPoint,circleElement->m_endPoints);
             painter->drawEllipse(rect);
             //            painter->drawRect(rect);
-        }
+//        }
     }
 }
 
@@ -343,15 +330,15 @@ void PaintedItem::rectPaintEvent(QPainter *painter)
     for(int i=0;i<size;i++){
         RectElement *rectElement=m_rectElements[i];
         painter->setPen(rectElement->m_pen);
-        int maxSize=rectElement->m_endPoints.size();
-        if(maxSize>0&&(rectElement!=nullptr)){
+//        int maxSize=rectElement->m_endPoints.size();
+//        if(maxSize>0&&(rectElement!=nullptr)){
             //椭圆要求在一个矩形区域内
-            QRect rect(rectElement->m_startPoint,rectElement->m_endPoints[maxSize-1]);
+            QRect rect(rectElement->m_startPoint,rectElement->m_endPoints);
             painter->drawRect(rect);
             if(rectElement->m_isFill){
                 painter->fillRect(rect,rectElement->m_pen.color());
             }
-        }
+//        }
     }
 }
 
@@ -361,10 +348,10 @@ void PaintedItem::linePaintEvent(QPainter *painter)
     for(int i=0;i<size;i++){
         LineElement *lineElement=m_lineElements[i];
         painter->setPen(lineElement->m_pen);
-        int maxSize=lineElement->m_endPoints.size();
-        if(maxSize>0&&(lineElement!=nullptr)){
-            painter->drawLine(lineElement->m_startPoint,lineElement->m_endPoints[maxSize-1]);
-        }
+//        int maxSize=lineElement->m_endPoints.size();
+//        if(maxSize>0&&(lineElement!=nullptr)){
+            painter->drawLine(lineElement->m_startPoint,lineElement->m_endPoints);
+//        }
     }
 }
 
@@ -372,7 +359,7 @@ void PaintedItem::doodlePaintEvent(QPainter *painter)
 {
     int size=m_doodleElements.size();
     for(int i=0;i<size;i++){
-        DoodleElement* doodleElement=m_doodleElements[i];
+        Doodle* doodleElement=m_doodleElements[i];
         painter->setPen(doodleElement->m_pen);
         painter->drawLines(doodleElement->m_lines);
     }
@@ -396,43 +383,39 @@ void PaintedItem::textMoveEvent()
         setprintPoint(m_startPoint);
     }
     //文字区域的宽度
-//     int width=m_startPoint.x()-m_lastPoint.y();
-    int width=m_startPoint.x()-m_lastPoint.x();
-    int height = m_startPoint.y() - m_lastPoint.y();
-
-
+    int width=m_startPoint.x()-m_lastPoint.y();
     if(width<0){
-        //宽度小于0的情况下，默认宽度为0
-        //width=-width;
-        width = 0;
+        width=-width;
     }
     setTextWidth(width);
-    setTextHeight(height);
     qDebug()<<"文字区域的宽度限制为："<<width;
 
     //在这边不直接将起始点终止点确定下来
     //为了实现随着鼠标的移动，图形也在不断移动
     m_textElement->m_startPoint=m_startPoint;
-    m_textElement->m_endPoints.push_back(m_lastPoint);
-
+    m_textElement->m_endPoints=m_lastPoint;
+    update();
 }
 
 void PaintedItem::circleMoveEvent()
 {
     m_circleElement->m_startPoint=m_startPoint;
-    m_circleElement->m_endPoints.push_back(m_lastPoint);
+    m_circleElement->m_endPoints=m_lastPoint;
+    update();
 }
 
 void PaintedItem::rectMoveEvent()
 {
     m_rectElement->m_startPoint=m_startPoint;
-    m_rectElement->m_endPoints.push_back(m_lastPoint);
+    m_rectElement->m_endPoints=m_lastPoint;
+    update();
 }
 
 void PaintedItem::lineMoveEvent()
 {
     m_lineElement->m_startPoint=m_startPoint;
-    m_lineElement->m_endPoints.push_back(m_lastPoint);
+    m_lineElement->m_endPoints=m_lastPoint;
+    update();
 }
 
 void PaintedItem::doodleMoveEvent()
@@ -501,14 +484,4 @@ void PaintedItem::setTextWidth(int newTextWidth)
         return;
     m_textWidth = newTextWidth;
     emit textWidthChanged();
-}
-
-void PaintedItem::setTextHeight(int newTextHeight)
-{
-    if(m_textHeight == newTextHeight){
-        return;
-    }else{
-        m_textHeight = newTextHeight;
-    }
-    emit textHeightChanged();
 }

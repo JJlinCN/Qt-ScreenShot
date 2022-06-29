@@ -2,13 +2,14 @@
 import QtQuick
 import QtQuick.Controls as QQC
 import Qt.labs.platform
-import paintitem
+import painteditem
 
 
 Item {
     function selectImage(){
         scrollimg.source = arguments[0]
     }//选择图片
+
     property alias paint1: paint
 
     property alias img_paint:scrollimg
@@ -32,6 +33,7 @@ Item {
 
     //撤销是判断最近一次操作是否是裁剪
     property bool isCut: false
+
     //重新设置img的大小、位置
     function reUpdate() {
         paint.destroyRect()
@@ -49,6 +51,7 @@ Item {
         rectWidth = arguments[0].width
         rectHeight = arguments[0].height
     }
+
     Column {
         id: leftside
         height: parent.height
@@ -78,7 +81,7 @@ Item {
                     //剪切操作，向painteditem里的m_sequence里push_back(6)
                     paint.pressCutSequence()
                     shotImg.visible = false
-                    draghandler.enabled=false
+                    draghandler.enabled=false;//进行操作时禁用拖拽区
                 }
             }
 
@@ -100,7 +103,7 @@ Item {
                                          rectHeight)
                     cutImgConfirm.visible = false
                     cutImage.visible = false
-                    draghandler.enabled=false
+                    draghandler.enabled=true;
                 }
             }
             //画笔
@@ -113,7 +116,7 @@ Item {
                 onClicked: {
                     paint.enabled = true
                     paint.flag = 5
-                    draghandler.enabled=false
+                    draghandler.enabled=false;
                 }
             }
 
@@ -129,7 +132,7 @@ Item {
                     console.log("1")
                     paint.flag = 1
                     textedit.focus=true
-                    draghandler.enabled=false
+                    draghandler.enabled=false;
                 }
             }
 
@@ -149,7 +152,7 @@ Item {
                                 drawframe.icon.source = icon.source
                                 paint.enabled = true
                                 paint.flag = 3
-                                draghandler.enabled=false
+                                draghandler.enabled=false;
                             }
                     }
                     QQC.MenuItem {
@@ -160,7 +163,7 @@ Item {
                                 paint.enabled = true
                                 console.log("2")
                                 paint.flag = 2
-                                draghandler.enabled=false
+                                draghandler.enabled=false;
                             }
                     }
 
@@ -171,7 +174,7 @@ Item {
                             drawframe.icon.source = icon.source
                             paint.enabled = true
                             paint.flag = 4
-                            draghandler.enabled=false
+                            draghandler.enabled=false;
                         }
                     }
                 }
@@ -184,7 +187,7 @@ Item {
                 width: 40
                 height: 40
                 onClicked: {
-                    filter.mosaic()
+                    console.log("mosaic")
                 }
             }
 
@@ -248,7 +251,7 @@ Item {
                     QQC.MenuItem{
                         text:qsTr("返回")
                         onTriggered: {
-                            capture.filterUndo();
+                            capture.filterSoften();
                         }
                     }
                 }
@@ -261,11 +264,13 @@ Item {
                 width: 40
                 height: 40
                 onClicked: {
+                    paint.enabled=false;
                     isCut = paint.isdoCut("undo")
                     paint.undo()
                     if (isCut) {
                         backImg(paint.undo_backRect("undo"))
                     }
+                    draghandler.enabled=true;
                 }
             }
 
@@ -276,13 +281,14 @@ Item {
                 width: 40
                 height: 40
                 onClicked: {
+                    paint.enabled=false;
                     isCut=paint.isdoCut("clear")
                     paint.clear()
                     if(isCut){
                     backImg(paint.undo_backRect("clear"))
                     }
                     cutImage.cutreUpdate(scrollimg.width, scrollimg.height)
-                    draghandler.enabled=true
+                    draghandler.enabled=true;
                 }
             }
         }
@@ -301,6 +307,7 @@ Item {
                 id: colordialog
                 onAccepted: {
                     rect.color = color
+                    painterColor = color
                 }
             }
 
@@ -356,6 +363,8 @@ Item {
                 id: textcolordialog
                 onAccepted: {
                     rect1.color = color
+                    textpaintColor = color
+                    console.log(textcolor)
                 }
             }
 
@@ -404,101 +413,101 @@ Item {
         height: parent.height
         focus: true
         clip:false
-        contentChildren:Rectangle{
+        contentChildren:Rectangle {
             id: rec
-            width: scrollview.width
-            height: scrollview.height
+            width: rectWidth
+            height: rectHeight
             clip: true
             Image {
-                        id: scrollimg
-                        cache: false
-                        fillMode: Image.PreserveAspectFit
-                        x: rectX
-                        y: rectY
-                        WheelHandler{
-                            acceptedModifiers: Qt.ControlModifier //按下controls键才响应滚轮事件
-                            property: "scale" //设置滚动缩放
+            id: scrollimg
+            cache: false
+            fillMode: Image.PreserveAspectFit
+            x: rectX
+            y: rectY
+            WheelHandler{
+                acceptedModifiers: Qt.ControlModifier //按下controls键才响应滚轮事件
+                property: "scale" //设置滚动缩放
+            }
+            DragHandler{ //设置可拖拽
+                id:draghandler
+            }
+            TextEdit {
+                id: textedit
+                x: paint.printPoint.x
+                y: paint.printPoint.y
+                focus: false
+                //设置键盘事件
+                Keys.onPressed: {
+                    if(event.modifiers===Qt.ControlModifier&&event.key===Qt.Key_Z){
+                        console.log("ctrl+z键盘事件被触发")
+                        isCut = paint.isdoCut()
+                        paint.undo()
+                        if (isCut) {
+                            backImg(paint.undo_backRect("undo"))
                         }
-                        DragHandler{ //设置可拖拽
-                            id:draghandler
-                        }
-                        TextEdit {
-                            id: textedit
-                            x: paint.printPoint.x
-                            y: paint.printPoint.y
-                            focus: false
-                            //设置键盘事件
-                            Keys.onPressed: {
-                                if(event.modifiers===Qt.ControlModifier&&event.key===Qt.Key_Z){
-                                    console.log("ctrl+z键盘事件被触发")
-                                    isCut = paint.isdoCut()
-                                    paint.undo()
-                                    if (isCut) {
-                                        backImg(paint.undo_backRect("undo"))
-                                    }
-                                }else{
-                                    event.accepted=false
-                                }
-                            }
+                    }else{
+                        event.accepted=false
+                    }
+                }
 
-                            //                    height: paint.rectLength
-                            //将其设置为paint.textEdit的原因是避免上次编辑造成的影响
-                            text: paint.textEdit
-                            font.pixelSize: paint.textFont
-                            color: textpaintColor
-                            onTextChanged: {
-                                if (paint.flag == 1) {
-                                    textedit.focus = true
-                                    console.log("setTextEdit")
-                                    console.log(textedit.text)
-                                    paint.settextEdit(textedit.text)
-                                    textedit.visible = true
-                                }
-                                console.log("qml中文字区域的长度是："+textedit.width)
-                            }
-                            //当字体颜色改变时
-                            onColorChanged: {
-                                if (paint.flag === 1) {
-                                    paint.setTextColor(color)
-                                }
-                            }
-                            //当字体的大小改变时
-                            onFontChanged: {
-                                if (paint.flag ===1) {
-                                    paint.setTextFont(textedit.font.pixelSize)
-                                }
-                            }
+                //                    height: paint.rectLength
+                //将其设置为paint.textEdit的原因是避免上次编辑造成的影响
+                text: paint.textEdit
+                font.pixelSize: paint.textFont
+                color: textpaintColor
+                onTextChanged: {
+                    if (paint.flag == 1) {
+                        textedit.focus = true
+                        console.log("setTextEdit")
+                        console.log(textedit.text)
+                        paint.settextEdit(textedit.text)
+                        textedit.visible = true
+                    }
+                    console.log("qml中文字区域的长度是："+textedit.width)
+                }
+                //当字体颜色改变时
+                onColorChanged: {
+                    if (paint.flag === 1) {
+                        paint.setTextColor(color)
+                    }
+                }
+                //当字体的大小改变时
+                onFontChanged: {
+                    if (paint.flag ===1) {
+                        paint.setTextFont(textedit.font.pixelSize)
+                    }
+                }
 
-                            visible: false
-                        }
+                visible: false
+            }
 
-                        //涂鸦类
-                        PaintedItem {
-                            id: paint
-                            anchors.fill: scrollimg
-                            enabled: false
-                            penColor: painterColor
-                            penWidth: paintSpinBox.value
-                            textColor: textpaintColor
-                            textFont: fontSpinBox.value
-                            onClearSignal: {
-                                console.log("clearsignal")
-                                textedit.text = ""
-                                //                        paint.settextEdit(textedit.text)
-                            }
-                            onUndoSignal: {
-                                textedit.text = ""
-                            }
-                        }
-                        CutImageRect {
-                            id: cutImage
-                            imgWidth: scrollimg.width
-                            imgHeight: scrollimg.height
-                            visible: false
-                        }
-                   }
-        }
-     }
+            //涂鸦类
+            PaintedItem {
+                id: paint
+                anchors.fill: scrollimg
+                enabled: false
+                penColor: painterColor
+                penWidth: paintSpinBox.value
+                textColor: textpaintColor
+                textFont: fontSpinBox.value
+                onClearSignal: {
+                    console.log("clearsignal")
+                    textedit.text = ""
+                    //                        paint.settextEdit(textedit.text)
+                }
+                onUndoSignal: {
+                    textedit.text = ""
+                }
+            }
+            CutImageRect {
+                id: cutImage
+                imgWidth: scrollimg.width
+                imgHeight: scrollimg.height
+                visible: false
+            }
+          }
+         }
+       }
     Connections {
         target: capture
         function onCallImageChanged() {
