@@ -2,13 +2,53 @@
 import QtQuick
 import QtQuick.Controls as QQC
 import Qt.labs.platform
-
+import paintitem
 
 
 Item {
     function selectImage(){
         scrollimg.source = arguments[0]
     }//选择图片
+    property alias paint1: paint
+
+    property alias img_paint:scrollimg
+    property bool counter: false
+    //设置画笔颜色，画笔粗细
+    property string painterColor: "red"
+
+    //设置文字颜色，文字粗细
+    property string textpaintColor: "black"
+
+    //设置剪切后的图片位置
+    property int rectX: 0
+    property int rectY: 0
+
+    //剪切矩形的大小
+    property int rectWidth: scrollimg.width
+    property int rectHeight: scrollimg.height
+
+    //记录剪切次数，目的是将第一次的矩形大小与位置传递
+    property int rectClick: 0
+
+    //撤销是判断最近一次操作是否是裁剪
+    property bool isCut: false
+    //重新设置img的大小、位置
+    function reUpdate() {
+        paint.destroyRect()
+        rectX = 0
+        rectY = 0
+        rectWidth = scrollimg.width
+        rectHeight = scrollimg.height
+        rectClick=0
+    }
+
+    //根据undo或clear取重新设置img特定的大小、位置
+    function backImg() {
+        rectX = arguments[0].x
+        rectY = arguments[0].y
+        rectWidth = arguments[0].width
+        rectHeight = arguments[0].height
+    }
     Column {
         id: leftside
         height: parent.height
@@ -27,6 +67,19 @@ Item {
                 width: 40
                 height: 40
                 icon.source: "qrc:/icons/cut.png"
+                onClicked: {
+                    cutImgConfirm.visible = true
+                    cutImage.visible = true
+                    rectClick++
+                    //第一次裁剪之前需要将最开始的图片大小位置传递
+                    if (rectClick == 1) {
+                        paint.sendRectNumber(0, 0, scrollimg.width, scrollimg.height)
+                    }
+                    //剪切操作，向painteditem里的m_sequence里push_back(6)
+                    paint.pressCutSequence()
+                    shotImg.visible = false
+                    draghandler.enabled=false
+                }
             }
 
             QQC.Button{
@@ -38,6 +91,17 @@ Item {
                     anchors.centerIn: parent
                     text: qsTr("OK")
                 }
+                onClicked: {
+                    shotImg.visible = true
+                    //获取剪切矩形的位置、大小
+                    cutImage.cut()
+                    //传递剪切矩形的位置、大小
+                    paint.sendRectNumber(rectX, rectY, rectWidth,
+                                         rectHeight)
+                    cutImgConfirm.visible = false
+                    cutImage.visible = false
+                    draghandler.enabled=false
+                }
             }
             //画笔
             QQC.Button {
@@ -46,6 +110,11 @@ Item {
                 width: 40
                 height: 40
                 icon.source: "qrc:/icons/paint.png"
+                onClicked: {
+                    paint.enabled = true
+                    paint.flag = 5
+                    draghandler.enabled=false
+                }
             }
 
             //文本
@@ -55,6 +124,13 @@ Item {
                 width: 40
                 height: 40
                 icon.source: "qrc:/icons/draw-text.png"
+                onClicked: {
+                    paint.enabled = true
+                    console.log("1")
+                    paint.flag = 1
+                    textedit.focus=true
+                    draghandler.enabled=false
+                }
             }
 
             //画框
@@ -69,15 +145,34 @@ Item {
                     QQC.MenuItem {
                             text: qsTr("Rectangle")
                             icon.source: "qrc:/icons/rectangle.png"
+                            onTriggered: {
+                                drawframe.icon.source = icon.source
+                                paint.enabled = true
+                                paint.flag = 3
+                                draghandler.enabled=false
+                            }
                     }
                     QQC.MenuItem {
                             text: qsTr("circle")
                             icon.source: "qrc:/icons/draw-ellipse.png"
+                            onTriggered: {
+                                drawframe.icon.source = icon.source
+                                paint.enabled = true
+                                console.log("2")
+                                paint.flag = 2
+                                draghandler.enabled=false
+                            }
                     }
 
                     QQC.MenuItem {
                         text: qsTr("Line(L)")
                         icon.source: "qrc:/icons/line.png"
+                        onTriggered: {
+                            drawframe.icon.source = icon.source
+                            paint.enabled = true
+                            paint.flag = 4
+                            draghandler.enabled=false
+                        }
                     }
                 }
             }
@@ -153,7 +248,7 @@ Item {
                     QQC.MenuItem{
                         text:qsTr("返回")
                         onTriggered: {
-                            capture.filterSoften();
+                            capture.filterUndo();
                         }
                     }
                 }
@@ -165,6 +260,13 @@ Item {
                 icon.source: "qrc:/icons/revoke.png"
                 width: 40
                 height: 40
+                onClicked: {
+                    isCut = paint.isdoCut("undo")
+                    paint.undo()
+                    if (isCut) {
+                        backImg(paint.undo_backRect("undo"))
+                    }
+                }
             }
 
             //清除
@@ -173,6 +275,15 @@ Item {
                 icon.source: "qrc:/icons/clear.png"
                 width: 40
                 height: 40
+                onClicked: {
+                    isCut=paint.isdoCut("clear")
+                    paint.clear()
+                    if(isCut){
+                    backImg(paint.undo_backRect("clear"))
+                    }
+                    cutImage.cutreUpdate(scrollimg.width, scrollimg.height)
+                    draghandler.enabled=true
+                }
             }
         }
 
@@ -293,23 +404,110 @@ Item {
         height: parent.height
         focus: true
         clip:false
-        contentChildren:Image {
-            id: scrollimg
-            cache: false
-            fillMode: Image.PreserveAspectFit
-            WheelHandler{
-                acceptedModifiers: Qt.ControlModifier //按下controls键才响应滚轮事件
-                property: "scale" //设置滚动缩放
-            }
-            DragHandler{ //设置可拖拽
-            }
-          }
+        contentChildren:Rectangle{
+            id: rec
+            width: scrollview.width
+            height: scrollview.height
+            clip: true
+            Image {
+                        id: scrollimg
+                        cache: false
+                        fillMode: Image.PreserveAspectFit
+                        x: rectX
+                        y: rectY
+                        WheelHandler{
+                            acceptedModifiers: Qt.ControlModifier //按下controls键才响应滚轮事件
+                            property: "scale" //设置滚动缩放
+                        }
+                        DragHandler{ //设置可拖拽
+                            id:draghandler
+                        }
+                        TextEdit {
+                            id: textedit
+                            x: paint.printPoint.x
+                            y: paint.printPoint.y
+                            focus: false
+                            //设置键盘事件
+                            Keys.onPressed: {
+                                if(event.modifiers===Qt.ControlModifier&&event.key===Qt.Key_Z){
+                                    console.log("ctrl+z键盘事件被触发")
+                                    isCut = paint.isdoCut()
+                                    paint.undo()
+                                    if (isCut) {
+                                        backImg(paint.undo_backRect("undo"))
+                                    }
+                                }else{
+                                    event.accepted=false
+                                }
+                            }
+
+                            //                    height: paint.rectLength
+                            //将其设置为paint.textEdit的原因是避免上次编辑造成的影响
+                            text: paint.textEdit
+                            font.pixelSize: paint.textFont
+                            color: textpaintColor
+                            onTextChanged: {
+                                if (paint.flag == 1) {
+                                    textedit.focus = true
+                                    console.log("setTextEdit")
+                                    console.log(textedit.text)
+                                    paint.settextEdit(textedit.text)
+                                    textedit.visible = true
+                                }
+                                console.log("qml中文字区域的长度是："+textedit.width)
+                            }
+                            //当字体颜色改变时
+                            onColorChanged: {
+                                if (paint.flag === 1) {
+                                    paint.setTextColor(color)
+                                }
+                            }
+                            //当字体的大小改变时
+                            onFontChanged: {
+                                if (paint.flag ===1) {
+                                    paint.setTextFont(textedit.font.pixelSize)
+                                }
+                            }
+
+                            visible: false
+                        }
+
+                        //涂鸦类
+                        PaintedItem {
+                            id: paint
+                            anchors.fill: scrollimg
+                            enabled: false
+                            penColor: painterColor
+                            penWidth: paintSpinBox.value
+                            textColor: textpaintColor
+                            textFont: fontSpinBox.value
+                            onClearSignal: {
+                                console.log("clearsignal")
+                                textedit.text = ""
+                                //                        paint.settextEdit(textedit.text)
+                            }
+                            onUndoSignal: {
+                                textedit.text = ""
+                            }
+                        }
+                        CutImageRect {
+                            id: cutImage
+                            imgWidth: scrollimg.width
+                            imgHeight: scrollimg.height
+                            visible: false
+                        }
+                   }
         }
+     }
     Connections {
         target: capture
         function onCallImageChanged() {
             scrollimg.source = ""
             scrollimg.source = "image://screen"
+            //每次截取新的图片都需要将之前所裁剪矩形（图片）设置成当前图片的大小
+            reUpdate()
+            //重新设置裁剪框的大小
+            cutImage.cutreUpdate(scrollimg.width, scrollimg.height)
         }
     }
 }

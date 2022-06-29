@@ -188,6 +188,10 @@ void Capture::filterUndo(){
 }
 
 void Capture::saveImage(QString savePath){
-    imageProvider->image.save(savePath);
-    qDebug()<<savePath;
+    //savePath是来自对话框的文件路径，需要裁剪为系统根环境路径
+    QString realSavePath;
+    for(int i =7;i<savePath.size();i++){
+        realSavePath.push_back(savePath.at(i));
+    }
+    imageProvider->image.save(realSavePath);
 }

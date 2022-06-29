@@ -2,24 +2,32 @@ QT += quick
 QT += gui
 QT += widgets printsupport
 
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+CONFIG += qmltypes
+QML_IMPORT_NAME = paintitem
+QML_IMPORT_MAJOR_VERSION = 1
 LIBS += /usr/lib/libKF5WindowSystem.so.5
 
-INCLUDEPATH += /usr/include/KF5/KWindowSystem
+INCLUDEPATH += /usr/include/KF5/KWindowSystem\
+               piantitem
 
 SOURCES += \
     capture.cpp \
+    copypaintitem.cpp \
+    edit.cpp \
     filter.cpp \
     freecapture.cpp \
     gifwidget.cpp \
     longshot.cpp \
-        main.cpp \
+    main.cpp \
     mylabel.cpp \
+    paintitem.cpp \
         recscreen.cpp \
     share.cpp
 
-resources.files = main.qml 
+resources.files =
 resources.prefix = /$${TARGET}
 RESOURCES += resources \
     qml.qrc
@@ -38,6 +46,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     Gif.h \
     capture.h \
+    copypainteditem.h \
+    edit.h \
+    elementgroup.h \
     filter.h \
     freecapture.h \
     gifwidget.h \
@@ -46,11 +57,10 @@ HEADERS += \
     RecScreen.h \
 FORMS += \
     mylabel.h \
+    paintitem.h \
     share.h
 
-DISTFILES += \
-    MainContent.qml
+DISTFILES +=
 
-FORMS += \
-    form.ui \
+FORMS += form.ui \
     form2.ui

@@ -42,10 +42,14 @@
         <file>icons/undo.png</file>
         <file>icons/wexin.png</file>
         <file>icons/width.png</file>
-        <file>main.qml</file>
         <file>MainContent.qml</file>
         <file>MessageBox.qml</file>
         <file>Annotation.qml</file>
         <file>Dialogs.qml</file>
+        <file>FocusRect.qml</file>
+        <file>CutBorder.qml</file>
+        <file>CutImageRect.qml</file>
+        <file>RectMove.qml</file>
+        <file>main.qml</file>
     </qresource>
 </RCC>
