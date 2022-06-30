@@ -12,7 +12,7 @@ ApplicationWindow {
     minimumHeight: 480
     minimumWidth: 680
     visible: true
-    //property int count: 0
+    property bool saved: false
     MainContent {
         id: maincontent
         anchors.fill: parent
@@ -22,6 +22,9 @@ ApplicationWindow {
                 loadMessage.source="MessageBox.qml"
                 //Loader 的 item 属性指向它加载的组件的顶层 item 对于 Loader 加载的 item ，它暴露出来的接口，如属性、信号等，都可以通过 Loader 的 item 属性来访问。
             }
+        }
+        Component.onCompleted:{
+            capture.startFullShot()
         }
     }
     Annotation{
@@ -137,7 +140,11 @@ ApplicationWindow {
                                        annotation.visible=true //不用Loader的原因是该组件中的图片依赖根环境中的c++数据对象，使用Loader会新建一个环境，就不在根环境中了
                                    }else{
                                        //将修改过后的涂鸦内容保存 *
-                                       maincontent.refreshImage();//发射信号通知主界面刷新涂鸦后的图片 利用provider从缓存中读取
+//                                       capture.copyPaintImage()//调用capture函数发射合并信号通知将paint类中的操作合并capture类中的缓存图片中
+                                       annotation.paint1.setMyImage(capture.getImage())//设置缓存图片到paint类中
+                                       //qml中可以调用c++中slot中的槽函数，或者用Q_INVOKABLE宏声明过的方法property,但是普通函数是不能被识别的！！！
+                                       annotation.paint1.save()//进行操作集合并并将合并后图片通过信号带出来
+                                       root.saved=true
                                        btn.text="注释(E)"
                                        btn_1.enabled=true
                                        btn_2.enabled=true
@@ -297,7 +304,20 @@ ApplicationWindow {
             annotation.selectImage(fileOpenDialog.selectedFile)
         }
         fileSaveDialog.onAccepted: {
-            capture.saveImage(fileSaveDialog.selectedFile)
+            if(saved)
+            capture.saveImage(fileSaveDialog.selectedFile)//存缓存图片
+            else{
+                annotation.paint1.setMyImage(capture.getImage())
+                annotation.paint1.save()
+                capture.saveImage(fileSaveDialog.selectedFile)//存缓存图片
+            }
+        }
+    }
+    Connections{
+        target: annotation.paint1
+        function onImageAllReady() {
+            capture.setImage(arguments[0])//将缓存图片设置为最新的涂鸦图片
+            maincontent.refreshImage()//发射信号通知主界面刷新涂鸦后的图片 利用provider从缓存中读取
         }
     }
 }

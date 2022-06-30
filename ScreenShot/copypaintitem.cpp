@@ -11,21 +11,13 @@ CopyPaintItem::CopyPaintItem(QQuickItem *parent)
 
 }
 
-void CopyPaintItem::save(QString filepath)
+void CopyPaintItem::save()
 {
-    qDebug()<<"qml中传过来的路径是"<<filepath;
     copyPainter=new QPainter(&m_image);
     copyPainter->setRenderHint(QPainter::Antialiasing,true);
-
-    //元素保存的原理是将qml端绘制的元素，传到这个类中，进行重新绘制一遍并且保存
     paintEvent(nullptr);
-    QString path;
-    for(int i=7;i<filepath.size();i++){
-        path.push_back(filepath[i]);
-    }
-    saveCutImg();
-    qDebug()<<"-----------------c++中所要保存的路径是："<<path;
-    m_image.save(path,nullptr,-1);
+    saveCutImg();//合并操作
+    //合并完成的图像
 }
 
 void CopyPaintItem::paint(QPainter *painter)
@@ -42,6 +34,7 @@ void CopyPaintItem::paintEvent(QEvent *event)
     saveRectElement(copyPainter);
     saveLineElement(copyPainter);
     saveDoodleElement(copyPainter);
+//    saveMosaicElement(copyPainter);
 }
 
 void CopyPaintItem::saveTextElement(QPainter *painter)
@@ -154,4 +147,8 @@ void CopyPaintItem::saveCutImg()
         rect=m_rects[m_rects.size()-1]->m_cutRect;
         m_image=m_image.copy(-rect.x(),-rect.y(),rect.width(),rect.height());
     }
+}
+
+QImage CopyPaintItem::getFinalImage(){
+    return m_image;
 }

@@ -1,7 +1,3 @@
-/*
-author:huangyihong
-date:2022/6/29
-*/
 #ifndef SHARE_H
 #define SHARE_H
 

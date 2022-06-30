@@ -19,6 +19,7 @@ SOURCES += \
     gifwidget.cpp \
     longshot.cpp \
         main.cpp \
+    mosaic.cpp \
     mylabel.cpp \
     painteditem.cpp \
         recscreen.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
     longshot.h \
     RecScreen.h \
 FORMS += \
+    mosaic.h \
     mylabel.h \
     painteditem.h \
     share.h
@@ -60,4 +62,5 @@ DISTFILES +=
 
 FORMS += \
     form.ui \
-    form2.ui
+    form2.ui \
+    mosaic.ui

@@ -1,6 +1,3 @@
-/*author:longxinping
-date:2022/6/29
-*/
 #ifndef GIF_H
 #define GIF_H
 

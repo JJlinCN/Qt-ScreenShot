@@ -1,7 +1,25 @@
 /*
-author:huangyihong pengyueting
-date:2022/6/29
-*/
+ * This header file contains two functions, which are mainly used to calculate the moving distance
+ *
+ * author: 李梦雪 梁淑贞 张宝丹
+ * email：2304768518@qq.com 2239602082@qq.com 1395089569@qq.com
+ * time:2021.10
+
+ * Copyright (C) <2021>  <Mengxue Li,Shuzhen Liang,Baodan zhang>
+
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
 #ifndef ELEMENTGROUP_H
 #define ELEMENTGROUP_H
@@ -78,7 +96,7 @@ public:
     bool m_isFill;
 };
 
-//马赛克
+////马赛克
 //class MosaicElement{
 //public:
 //    MosaicElement(){}
@@ -90,7 +108,8 @@ public:
 //    //矩形区域的起始点
 //    QPoint m_startPoint;
 //    //矩形区域的终止点，用vector容器装可以确保当鼠标移动时，矩形区域也随之移动
-//    std::vector<QPoint> m_endPoints;
+////    std::vector<QPoint> m_endPoints;
+//    QPoint m_endPoints;
 //    //矩形边框的画笔
 //    QPen m_pen;
 //    //是否要填充颜色

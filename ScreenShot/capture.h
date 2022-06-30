@@ -1,7 +1,3 @@
-/*
-author:huangyihong pengyueting longxinping
-date:2022/6/29
-*/
 #ifndef CAPTURE_H
 #define CAPTURE_H
 #include<QMainWindow>
@@ -27,11 +23,12 @@ signals:
     void finishCapture();  //告诉qml截屏结束了
     void callImageChanged();  //有新的截屏产生，告知qml有新的图片截取下来
     void imageCopied();
-
+//    void copyPaintImageSend(QImage providerImage);
 public slots:
     void cutScreen(QPixmap capturePixmap); //将矩形截图和长截图的图片传递到qml中，并且复制
     void cutNull(); //没有截取屏幕，即退出了截屏
-
+    QImage getImage();
+    void setImage(QImage img);
     void startRectShot();
     void startActiveShot();
     void startFullShot();
@@ -53,15 +50,15 @@ public slots:
     void filterUndo();
     //保存图片
     void saveImage(QString savePath);
+//    void copyPaintImage();
 private:
 
 RectScreen *m_rectScreenShot;
 MyLabel *m_nailImage;
 FreeCapture *m_freeScreenShot;
 Filter *m_filter;
-
-int m_captureCount;//用来完成连续截图，计数截下图片的数量
-QString m_path; //在文件系统中图片存储的默认路径
+//int m_captureCount;
+//QString m_path;
 };
 
 #endif // CAPTURE_H

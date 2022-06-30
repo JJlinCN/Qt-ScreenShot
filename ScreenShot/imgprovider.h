@@ -1,7 +1,3 @@
-/*
-author:huangyihong
-date:2022/6/29
-*/
 #ifndef IMGPROVIDER_H
 #define IMGPROVIDER_H
 #include <QQuickImageProvider>

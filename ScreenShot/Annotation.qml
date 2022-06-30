@@ -187,7 +187,7 @@ Item {
                 width: 40
                 height: 40
                 onClicked: {
-                    console.log("mosaic")
+                    mosaic.show()
                 }
             }
 
@@ -251,7 +251,7 @@ Item {
                     QQC.MenuItem{
                         text:qsTr("返回")
                         onTriggered: {
-                            capture.filterSoften();
+                            capture.filterUndo();
                         }
                     }
                 }

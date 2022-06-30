@@ -8,6 +8,7 @@
 #include "share.h" 
 #include "longshot.h"
 #include "gifwidget.h"
+#include "mosaic.h"
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -18,11 +19,13 @@ int main(int argc, char *argv[])
     Share *share = new Share;
     LongShot *longshot = new LongShot;
     GifWidget *gifwidget = new GifWidget;
+    Mosaic *mosaic = new Mosaic;
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("capture",capture);
     engine.rootContext()->setContextProperty("share",share);
     engine.rootContext()->setContextProperty("gifwidget",gifwidget);
     engine.rootContext()->setContextProperty("longshot",longshot);
+    engine.rootContext()->setContextProperty("mosaic",mosaic);
     engine.addImageProvider(QLatin1String("screen"),dynamic_cast<QQmlImageProviderBase *>(capture->imageProvider));
     const QUrl url("qrc:/main.qml");
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

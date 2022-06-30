@@ -79,13 +79,13 @@ void PaintedItem::undo()
     update();
 }
 
-void PaintedItem::save(QString filePath)
+void PaintedItem::save()//传递图片和最终确定的操作集给copypaint类合成在一张图片上保存下来
 {
     //    copyPainter=new CopyPaintItem();
     //    copyPainter->CopyPaint(m_elements,m_myImage,m_textElements);
     CopyPaintItem* copyPainter=new CopyPaintItem();
-    m_mysource="file:///tmp/1.jpg";
-    m_myImage.load("/tmp/1.jpg");
+//    m_mysource="file:///tmp/1.jpg";
+//    m_myImage.load("/tmp/1.jpg");
     copyPainter->m_image=m_myImage;
     //文字
     copyPainter->m_textElements=m_textElements;
@@ -99,7 +99,9 @@ void PaintedItem::save(QString filePath)
     copyPainter->m_doodleElements=m_doodleElements;
     //剪切
     copyPainter->m_rects=m_rects;
-    copyPainter->save(filePath);
+    copyPainter->save();//进行合并
+    m_myImage = copyPainter->getFinalImage().copy();//将合并后的图片重新赋值给paint类中图片
+    emit imageAllReady(m_myImage);//将合并好的图片发送信号
 }
 
 void PaintedItem::paint(QPainter *painter)
@@ -174,7 +176,6 @@ void PaintedItem::mouseMoveEvent(QMouseEvent *event)
             //为了连起来
             setStartPoint(m_lastPoint);
         }
-
         update();
         }
 }

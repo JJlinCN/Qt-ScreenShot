@@ -1,7 +1,26 @@
 /*
-author:huangyihong pengyueting longxinping
-date:2022/6/29
-*/
+ * This class is responsible for various interactions between C + + and QML
+ *
+ * author: 李梦雪 梁淑贞 张宝丹
+ * email：2304768518@qq.com 2239602082@qq.com 1395089569@qq.com
+ * time:2021.10
+
+ * Copyright (C) <2021>  <Mengxue Li,Shuzhen Liang,Baodan zhang>
+
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 #ifndef PAINTEDITEM_H
 #define PAINTEDITEM_H
 
@@ -57,7 +76,7 @@ public:
     //清除、撤销、保存
     Q_INVOKABLE void clear();
     Q_INVOKABLE void undo();
-    Q_INVOKABLE void save(QString filePath);
+    Q_INVOKABLE void save();
 //    Q_INVOKABLE void openProcess();
 
     //设置剪切矩形
@@ -152,6 +171,8 @@ signals:
     void textFontChanged(int textFont);
 
     void textWidthChanged();
+
+    void imageAllReady(QImage img);
 
 public slots:
     void setEnabled(bool enabled){ m_bEnabled = enabled; }
@@ -273,18 +294,21 @@ protected:
     void rectPressEvent();
     void linePressEvent();
     void doodlePressEvent();
+    void mosaicPressEvent();
     //添加文字，鼠标移动时应进行的操作
     void textMoveEvent();
     void circleMoveEvent();
     void rectMoveEvent();
     void lineMoveEvent();
     void doodleMoveEvent();
+    void mosaicMoveEvent();
     //添加文字，重绘时应进行的操作
     void textPaintEvent(QPainter *painter);
     void circlePaintEvent(QPainter *painter);
     void rectPaintEvent(QPainter *painter);
     void linePaintEvent(QPainter *painter);
     void doodlePaintEvent(QPainter *painter);
+    void mosaicPaintEvent(QPainter *painter);
     // the Current ElementGroup
     bool m_bEnabled;
     bool m_bPressed;
