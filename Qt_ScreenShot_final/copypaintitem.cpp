@@ -1,3 +1,9 @@
+/*
+author:huangyihong longxinping
+date:2022/6/29
+*/
+
+//使用copypaintitem是将qml端绘制好的图片和所有元素都存储起来，利用这个类对绘制图片做存储
 #include "copypaintitem.h"
 #include <QPainter>
 #include <QPaintEvent>
@@ -40,12 +46,9 @@ void CopyPaintItem::paintEvent(QEvent *event)
 void CopyPaintItem::saveTextElement(QPainter *painter)
 {
     int size = m_textElements.size();
-//    qDebug()<<"size:"<<size;
     for(int i = 0; i < size; ++i){
         TextElement* m_textElement = m_textElements.at(i);
-//        int endSize=m_textElement->m_endPoints.size();
-//        if(endSize>0&&(m_textElement!=nullptr)){
-            QPoint lastPoint=m_textElement->m_endPoints;
+            QPoint lastPoint=m_textElement->m_endPoint;
             QPoint startPoint=m_textElement->m_startPoint;
             QRect rect;
             if(startPoint.x()>lastPoint.x()&&startPoint.y()<lastPoint.y()){
@@ -90,13 +93,9 @@ void CopyPaintItem::saveCircleElement(QPainter *painter)
     for(int i=0;i<size;i++){
         CircleElement *circleElement=m_circleElements[i];
         painter->setPen(circleElement->m_pen);
-//        int maxSize=circleElement->m_endPoints.size();
-//        if(maxSize>0&&(circleElement!=nullptr)){
             //椭圆要求在一个矩形区域内
-            QRect rect(circleElement->m_startPoint,circleElement->m_endPoints);
+            QRect rect(circleElement->m_startPoint,circleElement->m_endPoint);
             painter->drawEllipse(rect);
-//            painter->drawRect(rect);
-//        }
     }
 
 }
@@ -107,13 +106,8 @@ void CopyPaintItem::saveRectElement(QPainter *painter)
     for(int i=0;i<size;i++){
         RectElement *rectElement=m_rectElements[i];
         painter->setPen(rectElement->m_pen);
-//        int maxSize=rectElement->m_endPoints.size();
-//        if(maxSize>0&&(rectElement!=nullptr)){
-            //椭圆要求在一个矩形区域内
-            QRect rect(rectElement->m_startPoint,rectElement->m_endPoints);
-//            painter->drawEllipse(rect);
+            QRect rect(rectElement->m_startPoint,rectElement->m_endPoint);
             painter->drawRect(rect);
-//        }
     }
 }
 
@@ -123,10 +117,8 @@ void CopyPaintItem::saveLineElement(QPainter *painter)
     for(int i=0;i<size;i++){
         LineElement *lineElement=m_lineElements[i];
         painter->setPen(lineElement->m_pen);
-//        int maxSize=lineElement->m_endPoints.size();
-//        if(maxSize>0&&(lineElement!=nullptr)){
-            painter->drawLine(lineElement->m_startPoint,lineElement->m_endPoints);
-//        }
+            painter->drawLine(lineElement->m_startPoint,lineElement->m_endPoint);
+
     }
 }
 

@@ -1,3 +1,7 @@
+/*
+author:huangyihong pengyueting longxinping
+date:2022/6/29
+*/
 #ifndef CAPTURE_H
 #define CAPTURE_H
 #include<QMainWindow>

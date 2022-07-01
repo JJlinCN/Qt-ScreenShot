@@ -1,3 +1,7 @@
+/*
+author:huangyihong longxinping pengyueting
+date:2022/6/29
+*/
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include "capture.h"
@@ -9,6 +13,7 @@
 #include "longshot.h"
 #include "gifwidget.h"
 #include "mosaic.h"
+#include "painteditem.h"
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -26,6 +31,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty("gifwidget",gifwidget);
     engine.rootContext()->setContextProperty("longshot",longshot);
     engine.rootContext()->setContextProperty("mosaic",mosaic);
+        qmlRegisterType<PaintedItem>("qml.Controls", 1, 0, "PaintedItem");
     engine.addImageProvider(QLatin1String("screen"),dynamic_cast<QQmlImageProviderBase *>(capture->imageProvider));
     const QUrl url("qrc:/main.qml");
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

@@ -1,3 +1,7 @@
+/*
+author:huangyihong pengyueting longxinping
+date:2022/6/29
+*/
 #include <capture.h>
 #include <QApplication>
 #include <QScreen>
@@ -6,7 +10,7 @@
 #include "imgprovider.h"
 #include "mylabel.h"
 #include "filter.h"
-#include <KWindowSystem>
+//#include <KWindowSystem>
 #include <QDebug>
 
 Capture::Capture(QMainWindow *parent):QMainWindow(parent)/*,m_captureCount{0}*//*,m_path{"/temp/"}*/{

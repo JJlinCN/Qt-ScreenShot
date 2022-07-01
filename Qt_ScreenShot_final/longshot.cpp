@@ -1,3 +1,7 @@
+/*
+author:longxinping
+date:2022/6/29
+*/
 #include "longshot.h"
 #include<QPixmap>
 #include<QVBoxLayout>

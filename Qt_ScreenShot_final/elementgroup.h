@@ -1,25 +1,7 @@
 /*
- * This header file contains two functions, which are mainly used to calculate the moving distance
- *
- * author: 李梦雪 梁淑贞 张宝丹
- * email：2304768518@qq.com 2239602082@qq.com 1395089569@qq.com
- * time:2021.10
-
- * Copyright (C) <2021>  <Mengxue Li,Shuzhen Liang,Baodan zhang>
-
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+author:huangyihong pengyueting longxinping
+date:2022/6/30
+*/
 
 #ifndef ELEMENTGROUP_H
 #define ELEMENTGROUP_H
@@ -31,6 +13,8 @@
 #include <QPen>
 #include <QRectF>
 
+
+//在二次开发中，我们将一个集合装所有结束点变为只有一个结束点，因为最终需要的都是最后的那一个结束点
 //文字编辑
 class TextElement
 {
@@ -42,11 +26,13 @@ public:
         :m_text(text),m_recPen(recPen),m_textPen(textPen),m_font(textFont)
     {}
 
+    //我们想使用QTextEdit来表示文本框的文本编辑部分
+    //QTextEdit m_edit;
     //矩形区域的起始点
     QPoint m_startPoint;
     //矩形区域的终止点，用vector容器装可以确保当鼠标移动时，矩形区域也随之移动
 //    std::vector<QPoint> m_endPoints;
-    QPoint m_endPoints;
+    QPoint m_endPoint;
     //矩形区域的文本
     QString m_text;
     //矩形边框的画笔
@@ -69,7 +55,7 @@ public:
     QPoint m_startPoint;
     //椭圆型区域的终止点，用vector容器装可以确保当鼠标移动时，椭圆型区域也随之移动
 //    std::vector<QPoint> m_endPoints;
-    QPoint m_endPoints;
+    QPoint m_endPoint;
     //椭圆边框的画笔
     QPen m_pen;
     //是否要填充颜色
@@ -89,7 +75,7 @@ public:
     QPoint m_startPoint;
     //矩形区域的终止点，用vector容器装可以确保当鼠标移动时，矩形区域也随之移动
 //    std::vector<QPoint> m_endPoints;
-    QPoint m_endPoints;
+    QPoint m_endPoint;
     //矩形边框的画笔
     QPen m_pen;
     //是否要填充颜色
@@ -127,7 +113,7 @@ public:
     QPoint m_startPoint;
     //直线的终止点，用vector容器装可以确保当鼠标移动时，直线也随之移动
 //    std::vector<QPoint> m_endPoints;
-    QPoint m_endPoints;
+    QPoint m_endPoint;
     //直线的画笔
     QPen m_pen;
 };

@@ -1,3 +1,7 @@
+/*
+author:huangyihong
+date:2022/6/28
+*/
 #include "mylabel.h"
 #include <QMouseEvent>
 #include <QPoint>

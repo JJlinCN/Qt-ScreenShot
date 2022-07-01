@@ -2,7 +2,7 @@
 import QtQuick
 import QtQuick.Controls as QQC
 import Qt.labs.platform
-import painteditem
+import qml.Controls 1.0
 
 Item {
     function selectImage() {

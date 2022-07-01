@@ -1,26 +1,7 @@
 /*
- * This class is responsible for various interactions between C + + and QML
- *
- * author: 李梦雪 梁淑贞 张宝丹
- * email：2304768518@qq.com 2239602082@qq.com 1395089569@qq.com
- * time:2021.10
-
- * Copyright (C) <2021>  <Mengxue Li,Shuzhen Liang,Baodan zhang>
-
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
+author:huangyihong pengyueting longxinping
+date:2022/6/30
+*/
 #ifndef PAINTEDITEM_H
 #define PAINTEDITEM_H
 
@@ -68,7 +49,7 @@ class PaintedItem : public QQuickPaintedItem
 
     //当前进行的编辑操作是什么
     Q_PROPERTY(int  flag READ flag WRITE setFlag NOTIFY flagChanged);
-    QML_ELEMENT
+//    QML_ELEMENT
 public:
     PaintedItem(QQuickItem *parent = 0);
     ~PaintedItem();
@@ -217,11 +198,9 @@ public slots:
     void on_textEdit_changed(){
 //        qDebug()<<"on_textEdit_changed:"<<&m_textElement;
         if(m_flag==1&&m_textElement!=nullptr){
-            //改变文字
+            //改将文本内容更新
             m_textElement->m_text=m_textEdit;
 
-            //update两次会发生什么报错？？
-//            update();
         }
     }
 
@@ -318,10 +297,6 @@ private:
     QImage m_myImage;
     QUrl m_mysource;
 
-    //马赛克
-//    RectElement* m_mosaicElement;
-//    QVector<MosaicElement*> m_mosaicElements;
-
     //画各种涂鸦形状的笔
     QPen m_pen;
     //写文字的笔
@@ -361,10 +336,7 @@ private:
     QVector<Doodle*> m_doodleElements;
 
 //    //剪切矩形
-//    CutRectElement* m_rectCut;
     QVector<CutRectElement*> m_rects;
-//    QRectF *m_rect;
-//    QVector<QRectF*> m_rects;
 
     //文字区域的宽度
     int m_textWidth;
@@ -372,7 +344,6 @@ private:
     //当前所进行的编辑操作，1是文字，2是椭圆,3是矩形，4是直线,5是涂鸦
     int m_flag=0;
 
-//     RectElement* m_mosaicElement;
 };
 
 #endif // PAINTEDITEM_H

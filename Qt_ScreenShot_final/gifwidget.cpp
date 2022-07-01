@@ -1,3 +1,7 @@
+/*
+author:longxinping
+date:2022/6/29
+*/
 #include "gifwidget.h"
 #include<QApplication>
 #include<QScreen>
@@ -225,7 +229,7 @@ bool GifWidget::eventFilter(QObject *watched, QEvent *e)
         if(mouseEvent->button() == Qt::LeftButton)
         {
             mousePressed = true;
-            mousePoint = mouseEvent->globalPos()-this->pos();
+            mousePoint = mouseEvent->globalPosition().toPoint() - this->pos();
             return true;
         }
     }
@@ -238,7 +242,7 @@ bool GifWidget::eventFilter(QObject *watched, QEvent *e)
     {
         if(mousePressed)
         {
-            this->move(mouseEvent->globalPos() - mousePoint);
+            this->move(mouseEvent->globalPosition().toPoint() - mousePoint);
             return true;
         }
     }

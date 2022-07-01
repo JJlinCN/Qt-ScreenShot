@@ -1,3 +1,7 @@
+/*
+author:huangyihong pengyueting longxinping
+date:2022/6/30
+*/
 #include "painteditem.h"
 #include <QPainter>
 #include <QPen>
@@ -81,11 +85,8 @@ void PaintedItem::undo()
 
 void PaintedItem::save()//传递图片和最终确定的操作集给copypaint类合成在一张图片上保存下来
 {
-    //    copyPainter=new CopyPaintItem();
-    //    copyPainter->CopyPaint(m_elements,m_myImage,m_textElements);
+
     CopyPaintItem* copyPainter=new CopyPaintItem();
-//    m_mysource="file:///tmp/1.jpg";
-//    m_myImage.load("/tmp/1.jpg");
     copyPainter->m_image=m_myImage;
     //文字
     copyPainter->m_textElements=m_textElements;
@@ -259,7 +260,7 @@ void PaintedItem::textPaintEvent(QPainter *painter)
 
 //        int endSize=textElement->m_endPoints.size();
 //        if(endSize>0&&(textElement!=nullptr)){
-            QPoint lastPoint=textElement->m_endPoints;
+            QPoint lastPoint=textElement->m_endPoint;
             QPoint startPoint=textElement->m_startPoint;
             QRect rect;
             QPoint p,p1;
@@ -286,10 +287,6 @@ void PaintedItem::textPaintEvent(QPainter *painter)
                 p=startPoint;
                 p1=lastPoint;
             }
-
-            //将起始点和终止点的坐标改变
-            //            m_startPoint=p;
-            //            m_lastPoint=p1;
             QRect rec(p,p1);
             rect=rec;
 
@@ -314,32 +311,24 @@ void PaintedItem::circlePaintEvent(QPainter *painter)
     for(int i=0;i<size;i++){
         CircleElement *circleElement=m_circleElements[i];
         painter->setPen(circleElement->m_pen);
-//        int maxSize=circleElement->m_endPoints.size();
-//        if(maxSize>0&&(circleElement!=nullptr)){
-            //椭圆要求在一个矩形区域内
-            QRect rect(circleElement->m_startPoint,circleElement->m_endPoints);
+            QRect rect(circleElement->m_startPoint,circleElement->m_endPoint);
+            //画椭圆的原理是使用鼠标最后点和开始点来计算得到矩形，根据矩形框架绘制椭圆
             painter->drawEllipse(rect);
-            //            painter->drawRect(rect);
-//        }
     }
 }
 
 void PaintedItem::rectPaintEvent(QPainter *painter)
 {
     int size=m_rectElements.size();
-    //画每一个矩形
+    //画每一个矩形，因为qml端不能保存之前的绘制图形，所以每一次绘制事件都要将之前的元素都重新画一遍
     for(int i=0;i<size;i++){
         RectElement *rectElement=m_rectElements[i];
         painter->setPen(rectElement->m_pen);
-//        int maxSize=rectElement->m_endPoints.size();
-//        if(maxSize>0&&(rectElement!=nullptr)){
-            //椭圆要求在一个矩形区域内
-            QRect rect(rectElement->m_startPoint,rectElement->m_endPoints);
+            QRect rect(rectElement->m_startPoint,rectElement->m_endPoint);
             painter->drawRect(rect);
             if(rectElement->m_isFill){
                 painter->fillRect(rect,rectElement->m_pen.color());
             }
-//        }
     }
 }
 
@@ -349,10 +338,8 @@ void PaintedItem::linePaintEvent(QPainter *painter)
     for(int i=0;i<size;i++){
         LineElement *lineElement=m_lineElements[i];
         painter->setPen(lineElement->m_pen);
-//        int maxSize=lineElement->m_endPoints.size();
-//        if(maxSize>0&&(lineElement!=nullptr)){
-            painter->drawLine(lineElement->m_startPoint,lineElement->m_endPoints);
-//        }
+            painter->drawLine(lineElement->m_startPoint,lineElement->m_endPoint);
+
     }
 }
 
@@ -394,28 +381,28 @@ void PaintedItem::textMoveEvent()
     //在这边不直接将起始点终止点确定下来
     //为了实现随着鼠标的移动，图形也在不断移动
     m_textElement->m_startPoint=m_startPoint;
-    m_textElement->m_endPoints=m_lastPoint;
+    m_textElement->m_endPoint=m_lastPoint;
     update();
 }
 
 void PaintedItem::circleMoveEvent()
 {
     m_circleElement->m_startPoint=m_startPoint;
-    m_circleElement->m_endPoints=m_lastPoint;
+    m_circleElement->m_endPoint=m_lastPoint;
     update();
 }
 
 void PaintedItem::rectMoveEvent()
 {
     m_rectElement->m_startPoint=m_startPoint;
-    m_rectElement->m_endPoints=m_lastPoint;
+    m_rectElement->m_endPoint=m_lastPoint;
     update();
 }
 
 void PaintedItem::lineMoveEvent()
 {
     m_lineElement->m_startPoint=m_startPoint;
-    m_lineElement->m_endPoints=m_lastPoint;
+    m_lineElement->m_endPoint=m_lastPoint;
     update();
 }
 

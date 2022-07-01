@@ -1,3 +1,7 @@
+/*
+author:huangyihong
+date:2022/6/28
+*/
 #ifndef MYLABEL_H
 #define MYLABEL_H
 #include<QLabel>

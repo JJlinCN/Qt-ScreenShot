@@ -1,3 +1,7 @@
+/*
+author:huangyihonh
+date:2022/6/29
+*/
 #include"RecScreen.h"
 #include<QApplication>
 #include<QDesktopServices>
@@ -33,6 +37,7 @@ void RectScreen::initWindow(){
 
 void RectScreen::loadBackgroundPixmap(){
     m_loadPixmap = QApplication::primaryScreen()->grabWindow(0); //截取的是当前屏幕的照片
+    //参数是0.就是截取全屏
 
     //设置截取到的屏幕的宽和高
     m_screenWidth = m_loadPixmap.width();
