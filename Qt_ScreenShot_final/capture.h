@@ -36,6 +36,7 @@ public slots:
     void startRectShot();
     void startActiveShot();
     void startFullShot();
+    void startContinueShot();
     void copyToClipboard(QImage image); //将内容复制到剪切板
     void copyCurrentImageToClipboard();
     void startFreeShot();//不规则截图

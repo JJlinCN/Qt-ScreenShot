@@ -78,6 +78,21 @@ void Capture::startFullShot()
     m_filter->setFilterImage(imageProvider->image);//设置滤镜初始图片为缓存图片
 }
 
+void Capture::startContinueShot()
+{
+    m_rectScreenShot = new RectScreen;
+    connect(m_rectScreenShot,&RectScreen::signalCompleteCapture,this,&Capture::cutScreen);
+    connect(m_rectScreenShot,&RectScreen::nullCapture,this,&Capture::cutNull);
+    m_rectScreenShot->show();
+}
+
+void Capture::startRectShot(){
+    m_rectScreenShot = new RectScreen;
+    connect(m_rectScreenShot,&RectScreen::signalCompleteCapture,this,&Capture::cutScreen);
+    connect(m_rectScreenShot,&RectScreen::nullCapture,this,&Capture::cutNull);
+    m_rectScreenShot->show();
+}
+
 void Capture::copyToClipboard(QImage image){
    // QImage image = capturePixmap.toImage();
     QApplication::clipboard()->clear();
@@ -128,12 +143,6 @@ void Capture::cutNull(){
     emit finishCapture();
 }
 
-void Capture::startRectShot(){
-    m_rectScreenShot = new RectScreen;
-    connect(m_rectScreenShot,&RectScreen::signalCompleteCapture,this,&Capture::cutScreen);
-    connect(m_rectScreenShot,&RectScreen::nullCapture,this,&Capture::cutNull);
-    m_rectScreenShot->show();
-}
 
 void Capture::startFreeShot(){
     m_freeScreenShot = new FreeCapture;

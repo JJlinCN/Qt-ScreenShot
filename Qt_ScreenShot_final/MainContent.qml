@@ -5,15 +5,15 @@ import QtQuick.Controls
 
 Item {
     property alias check_3: check_3
-    signal refreshImage()
-    onRefreshImage: ()=>{
-         img.source = ""
-         img.source = "image://screen"
-         /*img.source = "image://screen?id=" + count*/ //布尔值只是为了循环刷新路径触发provider中的requestimage函数返回缓存中的image图片到qml端显示
-    }
-    function selectImage(){
+    signal refreshImage
+    onRefreshImage: () => {
+                        img.source = ""
+                        img.source = "image://screen"
+                        /*img.source = "image://screen?id=" + count*/ //布尔值只是为了循环刷新路径触发provider中的requestimage函数返回缓存中的image图片到qml端显示
+                    }
+    function selectImage() {
         img.source = arguments[0]
-    }//选择图片
+    } //选择图片
 
     Image {
         id: img
@@ -156,167 +156,226 @@ Item {
                 onActivated: shotBtn.clicked()
             }
             onClicked: {
-                if(spinBox.value===0){
-                    if(cbb.displayText===qsTr("全屏截取")){
-                        if(check_2.checked == true){
+                if (spinBox.value === 0) {
+                    if (cbb.displayText === qsTr("全屏截取")) {
+                        if (check_2.checked == true) {
                             root.hide()
-                            timer.setTimeout(function(){ capture.startFullShot() },500)
-                            timer.setTimeout(function(){ root.show() },600)
-                        }else{
+                            timer.setTimeout(function () {
+                                capture.startFullShot()
+                            }, 500)
+                            timer.setTimeout(function () {
+                                root.show()
+                            }, 600)
+                        } else {
                             capture.startFullShot()
                         }
                     }
-                    if(cbb.displayText===qsTr("矩形截取")){
-                        if(check_2.checked == true){
+                    if (cbb.displayText === qsTr("矩形截取")) {
+                        if (check_2.checked == true) {
                             root.hide()
-                            timer.setTimeout(function(){ capture.startRectShot() },500)
-                            timer.setTimeout(function(){ root.show() },600)
-                        }else{
+                            timer.setTimeout(function () {
+                                capture.startRectShot()
+                            }, 500)
+                            timer.setTimeout(function () {
+                                root.show()
+                            }, 600)
+                        } else {
                             capture.startRectShot()
                         }
                     }
-                    if(cbb.displayText===qsTr("不规则截取")){
-                        if(check_2.checked == true){
+                    if (cbb.displayText === qsTr("不规则截取")) {
+                        if (check_2.checked == true) {
                             root.hide()
-                            timer.setTimeout(function(){ capture.startFreeShot() },500)
-                            timer.setTimeout(function(){ root.show() },600)
-                        }else{
+                            timer.setTimeout(function () {
+                                capture.startFreeShot()
+                            }, 500)
+                            timer.setTimeout(function () {
+                                root.show()
+                            }, 600)
+                        } else {
                             capture.startFreeShot()
                         }
                     }
-                    if(cbb.displayText===qsTr("连续截取")){
-
-                    }
-                    if(cbb.displayText===qsTr("钉在桌面")){
-                        if(check_2.checked == true){
+                    if (cbb.displayText === qsTr("连续截取")) {
+                        if (check_2.checked == true) {
                             root.hide()
-                            timer.setTimeout(function(){ capture.nailedToTable() },500)
-                            timer.setTimeout(function(){ root.show() },600)
-                        }else{
-                           capture.nailedToTable()
+                            timer.setTimeout(function () {
+                                capture.startContinueShot()
+                            }, 500)
+                            timer.setTimeout(function () {
+                                root.show()
+                            }, 600)
+                        } else {
+                            capture.startContinueShot()
                         }
                     }
-                    if(cbb.displayText===qsTr("活动窗口截取")){
-                        if(check_2.checked == true){
+                    if (cbb.displayText === qsTr("钉在桌面")) {
+                        if (check_2.checked == true) {
                             root.hide()
-                            timer.setTimeout(function(){ capture.startActiveShot() },500)
-                            timer.setTimeout(function(){ root.show() },500)
-                        }else{
+                            timer.setTimeout(function () {
+                                capture.nailedToTable()
+                            }, 500)
+                            timer.setTimeout(function () {
+                                root.show()
+                            }, 600)
+                        } else {
+                            capture.nailedToTable()
+                        }
+                    }
+                    if (cbb.displayText === qsTr("活动窗口截取")) {
+                        if (check_2.checked == true) {
+                            root.hide()
+                            timer.setTimeout(function () {
+                                capture.startActiveShot()
+                            }, 500)
+                            timer.setTimeout(function () {
+                                root.show()
+                            }, 500)
+                        } else {
                             capture.startActiveShot()
                         }
                     }
-                    if(cbb.displayText===qsTr("长截图")){
-                        if(check_2.checked == true){
+                    if (cbb.displayText === qsTr("长截图")) {
+                        if (check_2.checked == true) {
                             root.hide()
-                            timer.setTimeout(function(){ longshot.show() },500)
-                            timer.setTimeout(function(){ root.show() },500)
-                        }else{
+                            timer.setTimeout(function () {
+                                longshot.show()
+                            }, 500)
+                            timer.setTimeout(function () {
+                                root.show()
+                            }, 500)
+                        } else {
                             longshot.show()
                         }
                     }
-                }else{
+                } else {
                     countDown.start()
                 }
             }
         }
-    Connections {
-        target: capture
-        function onCallImageChanged() {
-            img.source = ""
-            img.source = "image://screen"
+        Connections {
+            target: capture
+            function onCallImageChanged() {
+                img.source = ""
+                img.source = "image://screen"
+            }
         }
-    }
-    Connections {
-        target: capture
-        function onFinishCapture() {
-            root.showNormal()
+        Connections {
+            target: capture
+            function onFinishCapture() {
+                root.showNormal()
+            }
         }
-    }
-    Timer{ //延时触发回调函数
-        id:timer
-        //triggered即使在触发一次之后回调也会保持与信号的连接。
-        //这意味着如果再次使用该延迟功能，定时器将再次触发所有连接的回调。所以你应该在触发后断开回调。
-        function setTimeout(cb, delayTime) {
-            timer.interval = delayTime; //根据客户代码确定延迟时间
-            timer.repeat = false; //不重复，只触发一次
-            timer.triggered.connect(cb); //触发信号连接回调函数
-            timer.triggered.connect(function release () { //断开连接
-                timer.triggered.disconnect(cb); // This is important
-                timer.triggered.disconnect(release); // This is important as well
-            });
-            timer.start();//开始计时
+        Timer {
+            //延时触发回调函数
+            id: timer
+            //triggered即使在触发一次之后回调也会保持与信号的连接。
+            //这意味着如果再次使用该延迟功能，定时器将再次触发所有连接的回调。所以你应该在触发后断开回调。
+            function setTimeout(cb, delayTime) {
+                timer.interval = delayTime //根据客户代码确定延迟时间
+                timer.repeat = false //不重复，只触发一次
+                timer.triggered.connect(cb) //触发信号连接回调函数
+                timer.triggered.connect(function release() {
+                    //断开连接
+                    timer.triggered.disconnect(cb) // This is important
+                    timer.triggered.disconnect(
+                                release) // This is important as well
+                })
+                timer.start() //开始计时
+            }
         }
-    }
 
-    Timer {
-        id: countDown
-        interval: 1000
-        repeat: true
-        onTriggered: {
-            console.log(spinBox.value)
-            spinBox.value -= 1
-            if(spinBox.value === 0 && cbb.currentText === qsTr("全屏截取")){
-                countDown.stop()
-                if(check_2.checked == true){
-                    root.hide()
-                    timer.setTimeout(function(){ capture.startFullShot() },500)
-                    timer.setTimeout(function(){ root.show() },600)
-                }else{
-                    capture.startFullShot()
-                }
+        Timer {
+            id: countDown
+            interval: 1000
+            repeat: true
+            onTriggered: {
+                console.log(spinBox.value)
+                spinBox.value -= 1
+                if (spinBox.value === 0 && cbb.currentText === qsTr("全屏截取")) {
+                    countDown.stop()
+                    if (check_2.checked == true) {
+                        root.hide()
+                        timer.setTimeout(function () {
+                            capture.startFullShot()
+                        }, 500)
+                        timer.setTimeout(function () {
+                            root.show()
+                        }, 600)
+                    } else {
+                        capture.startFullShot()
+                    }
+                } else if (spinBox.value === 0 && cbb.currentText === qsTr(
+                               "矩形截取")) {
+                    countDown.stop()
+                    if (check_2.checked == true) {
+                        root.hide()
+                        timer.setTimeout(function () {
+                            capture.startRectShot()
+                        }, 500)
+                    } else {
+                        capture.startRectShot()
+                    }
+                } else if (spinBox.value === 0 && cbb.currentText === qsTr(
+                               "不规则截取")) {
+                    countDown.stop()
+                    if (check_2.checked == true) {
+                        root.hide()
+                        timer.setTimeout(function () {
+                            capture.startFreeShot()
+                        }, 500)
+                    } else {
+                        capture.startFreeShot()
+                    }
+                } else if (spinBox.value === 0 && cbb.currentText === qsTr(
+                               "连续截取")) {
 
-            } else if (spinBox.value === 0 && cbb.currentText === qsTr("矩形截取")) {
-                countDown.stop()
-                if(check_2.checked == true){
-                    root.hide()
-                    timer.setTimeout(function(){ capture.startRectShot() },500)
-                }else{
-                    capture.startRectShot()
-                }
-            }else if (spinBox.value === 0 && cbb.currentText === qsTr("不规则截取")) {
-                countDown.stop()
-                if(check_2.checked == true){
-                    root.hide()
-                    timer.setTimeout(function(){ capture.startFreeShot() },500)
-                }else{
-                    capture.startFreeShot()
-                }
-            }else if (spinBox.value === 0 && cbb.currentText === qsTr("连续截取")) {
-//                countDown.stop()
-//                if(check_2.checked == true){
-//                    root.hide()
-//                    timer.setTimeout(function(){ capture.startContinueShot() },500)
-//                }else{
-//                    capture.startContinueShot()
-//                }
-            } else if(spinBox.value === 0 && cbb.currentText === qsTr("钉在桌面")){
-                countDown.stop()
-                if(check_2.checked == true){
-                    root.hide()
-                    timer.setTimeout(function(){ capture.nailedToTable() },500)
-                    timer.setTimeout(function(){ root.show() },600)
-                }else{
-                   capture.nailedToTable()
-                }
-            } else if(spinBox.value === 0 && cbb.currentText === qsTr("活动窗口截取")){
-                countDown.stop()
-                if(check_2.checked == true){
-                    root.hide()
-                    timer.setTimeout(function(){ capture.startActiveShot() },500)
-                }else{
-                    capture.startActiveShot()
-                }
-            }else if(spinBox.value === 0 && cbb.currentText === qsTr("长截图")){
-                countDown.stop()
-                if(check_2.checked == true){
-                    root.hide()
-                    timer.setTimeout(function(){ longshot.show() },500)
-                }else{
-                    longshot.show()
+                    //                countDown.stop()
+                    //                if(check_2.checked == true){
+                    //                    root.hide()
+                    //                    timer.setTimeout(function(){ capture.startContinueShot() },500)
+                    //                }else{
+                    //                    capture.startContinueShot()
+                    //                }
+                } else if (spinBox.value === 0 && cbb.currentText === qsTr(
+                               "钉在桌面")) {
+                    countDown.stop()
+                    if (check_2.checked == true) {
+                        root.hide()
+                        timer.setTimeout(function () {
+                            capture.nailedToTable()
+                        }, 500)
+                        timer.setTimeout(function () {
+                            root.show()
+                        }, 600)
+                    } else {
+                        capture.nailedToTable()
+                    }
+                } else if (spinBox.value === 0 && cbb.currentText === qsTr(
+                               "活动窗口截取")) {
+                    countDown.stop()
+                    if (check_2.checked == true) {
+                        root.hide()
+                        timer.setTimeout(function () {
+                            capture.startActiveShot()
+                        }, 500)
+                    } else {
+                        capture.startActiveShot()
+                    }
+                } else if (spinBox.value === 0
+                           && cbb.currentText === qsTr("长截图")) {
+                    countDown.stop()
+                    if (check_2.checked == true) {
+                        root.hide()
+                        timer.setTimeout(function () {
+                            longshot.show()
+                        }, 500)
+                    } else {
+                        longshot.show()
+                    }
                 }
             }
         }
-      }
     }
 }
 /*##^##

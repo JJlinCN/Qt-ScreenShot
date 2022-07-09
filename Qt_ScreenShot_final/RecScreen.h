@@ -7,6 +7,7 @@ date:2022/6/29
 
 #include<QtWidgets>
 #include<QPainter>
+
 class QLabel;
 
 enum CaptureState{
@@ -104,6 +105,8 @@ private:
     QRect m_currentSelectRect;
     int m_screenWidth;
     int m_screenHeight;
+    QVector<QPixmap> m_continuePixmaps;
+    QVector<QString> m_imgTimes;
     //int m_imageCount;
     //QLabel  *label;
 };

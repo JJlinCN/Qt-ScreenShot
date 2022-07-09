@@ -186,15 +186,41 @@ void RectScreen::paintEvent(QPaintEvent *event){  //一旦鼠标进行移动，�
 
 void RectScreen::keyPressEvent(QKeyEvent *event){
     if(event->key() == Qt::Key_Escape){
-        close();
-       // m_currentSelectRect = QRect(0,0,0,0);
-        emit nullCapture();
+        if(m_continuePixmaps.empty()){
+            close();
+                   // m_currentSelectRect = QRect(0,0,0,0);
+            emit nullCapture();
+        }else{
+
+            //为连续截图截取的图片单独创建一个文件夹
+            QDir *imgsFile = new QDir;
+            if(!imgsFile->exists("/ScreenShot")){
+                        qDebug() << "文件不存在，请创建文件";
+                        imgsFile->mkdir("/ScreenShot");
+            }
+            for(int i = 0; i < m_continuePixmaps.length();i++){
+                m_continuePixmaps.at(i).toImage().save("/ScreenShot/" + m_imgTimes.at(i) + ".png");
+            }
+            close();
+            emit signalCompleteCapture(m_continuePixmaps.at(m_continuePixmaps.length()-1));
+        }
     }
     if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return){
         emit signalCompleteCapture(m_capturePixmap);
         close();
 
         //m_currentSelectRect = QRect(0,0,0,0);
+    }
+    if(event->key() == Qt::Key_Space){
+
+       //QImage img = m_capturePixmap.toImage();
+        m_continuePixmaps.append(m_capturePixmap);
+        m_imgTimes.append(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss zzz"));
+
+        //重新更新画布
+        update();
+        //每次截图完后又是新的初始化界面
+        m_currentCaptureState = InitCapture;
     }
 }
 
