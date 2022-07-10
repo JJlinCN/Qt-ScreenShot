@@ -1,3 +1,5 @@
+//author:longxinping 2020051615040
+
 #ifndef GIF_H
 #define GIF_H
 

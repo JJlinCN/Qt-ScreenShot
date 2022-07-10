@@ -1,3 +1,5 @@
+//author:longxinping 2020051615040
+
 #ifndef MOSAIC_H
 #define MOSAIC_H
 

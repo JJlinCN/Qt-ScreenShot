@@ -1,4 +1,4 @@
-//pengyueting 2020051615252
+//author:longxinping 2020051615040
 #ifndef FILTER_H
 #define FILTER_H
 //#include"mosaic.h"
